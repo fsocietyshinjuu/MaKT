@@ -13,7 +13,7 @@ Free, private and runs right in your browser. No account, nothing uploaded.
 ![Data collected](https://img.shields.io/badge/data%20collected-none-2ea44f?style=flat-square)
 ![Price](https://img.shields.io/badge/price-free-1d6bff?style=flat-square)
 
-[**Open the web app**](app/) &nbsp;·&nbsp; [**Download for desktop**](#download) &nbsp;·&nbsp; [**Release notes**](#whats-new-in-121) &nbsp;·&nbsp; [**Support**](#support-the-developer)
+[**Open the web app**](https://fsocietyshinjuu.github.io/MaKT/app/) &nbsp;·&nbsp; [**Download for desktop**](#download) &nbsp;·&nbsp; [**Release notes**](#whats-new-in-121) &nbsp;·&nbsp; [**Support**](#support-the-developer)
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="assets/mouse-dark.jpg">
