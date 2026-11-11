@@ -1,0 +1,1164 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mouse and Keyboard Test</title>
+<meta name="description" content="Press any mouse button, scroll the wheel or hit any key and watch it light up. Measure your mouse DPI. Runs entirely in your browser.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23fff'/%3E%3Cpath d='M8 13c0-6 3.6-9 8-9s8 3 8 9v7c0 6-3.6 8-8 8s-8-2-8-8z' fill='none' stroke='%2314202e' stroke-width='2'/%3E%3Cpath d='M16 4v8M8 13c5-1.4 11-1.4 16 0' fill='none' stroke='%2314202e' stroke-width='1.6'/%3E%3Crect x='14' y='7' width='4' height='6' rx='2' fill='%231d6bff'/%3E%3C/svg%3E">
+<style>html{color-scheme:light}body{margin:0;font:14px system-ui,sans-serif}[hidden]{display:none!important}</style>
+<style>
+/* Layout: one 3/4-view line-art mouse, centered and scaled to fill the viewport. */
+:root {
+  --bg: #e8edf4;
+  --shell: #ffffff;
+  --shell-edge: #b9c4d4;
+  --seam: #c9d2df;
+  --lit: #1d6bff;
+  --tested: #a9c6ff;
+  --wheel: #d5dce8;
+  --line: #46708a;
+  --wall: #e3e9f2;
+  --fg: #14202e;
+  --muted: #52657a;
+  --on-lit: #ffffff;
+}
+:root[data-theme="light"] { color-scheme: light; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1520; --shell: #1b2433; --shell-edge: #3b4a63; --seam: #2e3b52;
+    --lit: #4d8dff; --tested: #2b4a85; --wheel: #2a364b; --line: #8fb4d0; --wall: #151d2b; --fg: #e8f0f9; --muted: #9db0c6; --on-lit: #0b1220; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1520; --shell: #1b2433; --shell-edge: #3b4a63; --seam: #2e3b52;
+  --lit: #4d8dff; --tested: #2b4a85; --wheel: #2a364b; --line: #8fb4d0; --wall: #151d2b; --fg: #e8f0f9; --muted: #9db0c6; --on-lit: #0b1220; color-scheme: dark;
+}
+html, body { height: 100%; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  overflow: hidden;
+  padding-block: 12px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  box-sizing: border-box;
+  cursor: default;
+  user-select: none;
+  -webkit-user-select: none;
+}
+svg { display: block; width: 100%; height: 100%; max-width: 100%; }
+/* line-art style: thin blue-grey outlines, white faces, flat arrows */
+.ol { vector-effect: non-scaling-stroke; }
+.band-edge { fill: var(--line); stroke: var(--line); stroke-width: 3; stroke-linejoin: round; }
+.band-fill { fill: var(--wall); stroke: none; }
+.body-top { fill: var(--shell); stroke: none; }
+.edge { fill: none; stroke: var(--line); stroke-width: 1.8; stroke-linejoin: round; }
+.part, .arrow, .recess { stroke: var(--line); stroke-width: 1.6; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+.part { fill: var(--shell); transition: fill 90ms ease-out; }
+.part.btn { stroke: none; }
+.part.tested { fill: var(--tested); }
+.part.on { fill: var(--lit); transition: none; }
+.wheel { fill: var(--wheel); }
+.wheel.tested { fill: var(--tested); }
+.wheel.on { fill: var(--lit); }
+.arrow { fill: var(--wheel); transition: fill 90ms ease-out; }
+.arrow.tested { fill: var(--tested); }
+.arrow.on { fill: var(--lit); transition: none; }
+.recess { fill: var(--wall); }
+.ln { fill: none; stroke: var(--line); stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; pointer-events: none; }
+.ridge { fill: none; stroke: var(--line); stroke-width: 1.1; stroke-linecap: round; pointer-events: none; }
+.view { height: 100%; box-sizing: border-box; padding-top: 52px; padding-bottom: 70px; }
+.view[hidden] { display: none; }
+.tabs {
+  top: max(12px, env(safe-area-inset-top, 0px));
+  left: max(16px, env(safe-area-inset-left, 0px));
+  display: flex; gap: 4px; padding: 4px; border-radius: 999px;
+  border: 1.5px solid var(--shell-edge); background: var(--shell);
+}
+.tabs button {
+  font: inherit; color: var(--fg); background: transparent; border: 0;
+  border-radius: 999px; padding: 8px 18px; cursor: pointer;
+}
+.tabs button:hover { background: var(--bg); }
+.tabs button[aria-selected="true"] { background: var(--lit); color: var(--on-lit); }
+.tabs button:focus-visible { outline: 2px solid var(--lit); outline-offset: 2px; }
+.kcase-wall { fill: var(--wall); stroke: var(--line); stroke-width: 1.6; vector-effect: non-scaling-stroke; }
+.kcase { fill: var(--shell); stroke: var(--line); stroke-width: 1.8; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
+.kwall { fill: var(--wall); stroke: var(--line); stroke-width: 1.2; vector-effect: non-scaling-stroke; }
+.kcap { fill: var(--shell); stroke: var(--line); stroke-width: 1.2; vector-effect: non-scaling-stroke; transition: fill 90ms ease-out; }
+.klabel { fill: var(--fg); font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; font-weight: 600; text-anchor: middle; dominant-baseline: central; pointer-events: none; }
+.key.tested .kcap { fill: var(--tested); }
+.key.on .kcap { fill: var(--lit); transition: none; }
+.key.on .klabel { fill: var(--on-lit); }
+.key.on .cap-g { transform: translate(0, 7px); }
+.toggle[hidden] { display: none; }
+.view-about { padding-top: 56px; padding-bottom: 0; }
+.about {
+  height: 100%; overflow-y: auto; box-sizing: border-box; padding: 24px 0 56px;
+  font: 15px/1.6 system-ui, -apple-system, 'Segoe UI', sans-serif; color: var(--fg);
+  user-select: text; -webkit-user-select: text; cursor: auto;
+}
+.about:focus-visible { outline: 2px solid var(--lit); outline-offset: -2px; }
+.ab-inner { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 40px; }
+.about header { display: flex; flex-direction: column; gap: 10px; }
+.about section { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.about h1 { margin: 0; font-size: 30px; line-height: 1.15; text-wrap: balance; }
+.about h2 { margin: 0; padding-bottom: 8px; font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); border-bottom: 1.5px solid var(--shell-edge); }
+.about p { margin: 0; max-width: 65ch; }
+.about ul, .about ol { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 8px; max-width: 65ch; }
+.ab-lead { font-size: 17px; color: var(--fg); }
+.ab-muted { color: var(--muted); font-size: 13px; }
+.ab-specs {
+  margin: 0; display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 8px 24px;
+  padding: 16px 18px; border: 1.5px solid var(--shell-edge); border-radius: 14px; background: var(--shell);
+}
+.ab-specs dt { color: var(--muted); }
+.ab-specs dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.ab-contact { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.ab-contact a { color: var(--lit); overflow-wrap: anywhere; }
+.copy { font: 600 13px system-ui, -apple-system, 'Segoe UI', sans-serif; color: var(--fg); padding: 6px 14px; }
+@media (max-width: 520px) { .ab-specs { grid-template-columns: minmax(0, 1fr); gap: 2px; } .ab-specs dd { margin-bottom: 8px; } .about h1 { font-size: 25px; } }
+.dpi-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.dpi-controls label { font-weight: 600; }
+.dpi-controls input, .dpi-controls select {
+  font: inherit; color: var(--fg); background: var(--shell); border: 1.5px solid var(--shell-edge);
+  border-radius: 10px; padding: 7px 10px; user-select: text; -webkit-user-select: text;
+}
+.dpi-controls input { width: 5.5em; }
+.dpi-controls input:focus-visible, .dpi-controls select:focus-visible { outline: 2px solid var(--lit); outline-offset: 2px; }
+.toggle.dpi-start { background: var(--lit); color: var(--on-lit); border-color: var(--lit); padding: 8px 20px; }
+.toggle.dpi-start:hover { background: var(--lit); filter: brightness(1.08); }
+.toggle.dpi-start:disabled { opacity: 0.6; cursor: default; filter: none; }
+.dpi-pad {
+  box-sizing: border-box; min-height: 170px; padding: 22px 20px; text-align: center;
+  display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 6px;
+  border: 1.5px solid var(--shell-edge); border-radius: 14px; background: var(--shell);
+}
+.dpi-pad.live { border-color: var(--lit); }
+.about .dpi-state { margin: 0; color: var(--muted); }
+.about .dpi-big { margin: 0; font: 700 56px/1.1 ui-monospace, 'SF Mono', 'Cascadia Mono', Consolas, monospace; font-variant-numeric: tabular-nums; }
+.dpi-big small { font-size: 18px; font-weight: 600; color: var(--muted); margin-left: 6px; }
+.dpi-runs { font-variant-numeric: tabular-nums; }
+@media (max-width: 520px) { .about .dpi-big { font-size: 42px; } }
+.snd-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.snd-row label { font-weight: 600; }
+.snd-row select {
+  font: inherit; color: var(--fg); background: var(--shell); border: 1.5px solid var(--shell-edge);
+  border-radius: 10px; padding: 7px 10px; flex: 1 1 220px; min-width: 0; max-width: 100%;
+}
+.snd-row select:focus-visible, .snd-row input:focus-visible, .snd-check input:focus-visible { outline: 2px solid var(--lit); outline-offset: 2px; }
+.snd-row input[type="range"] { flex: 1 1 180px; min-width: 0; accent-color: var(--lit); }
+.snd-row output { min-width: 3.2em; font-variant-numeric: tabular-nums; color: var(--muted); }
+.snd-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.toggle.snd-btn {
+  display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 16px 8px; border-radius: 14px;
+  font: 600 15px/1.3 system-ui, -apple-system, 'Segoe UI', sans-serif; color: var(--fg);
+}
+.snd-big { font: 700 34px/1 ui-monospace, 'SF Mono', 'Cascadia Mono', Consolas, monospace; }
+.toggle.snd-btn.playing { background: var(--lit); color: var(--on-lit); border-color: var(--lit); }
+.snd-check { display: flex; align-items: flex-start; gap: 10px; font-size: 14px; cursor: pointer; }
+.snd-check input { margin-top: 4px; accent-color: var(--lit); }
+.snd-meter { position: relative; height: 20px; border: 1.5px solid var(--shell-edge); border-radius: 999px; background: var(--shell); overflow: hidden; }
+.snd-fill { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: var(--lit); }
+.snd-fill.hot { background: #e8590c; }
+.snd-peak { position: absolute; top: 0; bottom: 0; left: 0; width: 3px; background: var(--fg); }
+.about .snd-level { margin: 0; font: 600 14px/1.4 ui-monospace, 'SF Mono', 'Cascadia Mono', Consolas, monospace; font-variant-numeric: tabular-nums; }
+@media (max-width: 520px) { .snd-big { font-size: 26px; } }
+@media (max-width: 380px) { .tabs button { padding: 8px 9px; } }
+.ui { position: fixed; z-index: 5; font: 600 13px/1.35 system-ui, -apple-system, 'Segoe UI', sans-serif; color: var(--fg); }
+.actions {
+  top: max(12px, env(safe-area-inset-top, 0px));
+  right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex; gap: 8px;
+}
+.actions .toggle { font: inherit; color: var(--fg); }
+@media (max-width: 520px) { .actions .toggle { padding: 8px 12px; } .tabs button { padding: 8px 12px; } }
+@media (max-width: 560px) {
+  .actions { top: calc(max(12px, env(safe-area-inset-top, 0px)) + 54px); left: max(16px, env(safe-area-inset-left, 0px)); right: auto; }
+  .view, .view-about { padding-top: 108px; }
+}
+.toggle {
+  padding: 10px 16px; border-radius: 999px; cursor: pointer;
+  border: 1.5px solid var(--shell-edge); background: var(--shell);
+}
+.toggle:hover { border-color: var(--lit); }
+.toggle:focus-visible { outline: 2px solid var(--lit); outline-offset: 2px; }
+.note {
+  left: 50%; transform: translateX(-50%);
+  bottom: max(16px, env(safe-area-inset-bottom, 0px));
+  width: max-content; max-width: min(92vw, 540px);
+  display: flex; gap: 10px; align-items: flex-start;
+  padding: 11px 16px; border-radius: 14px;
+  border: 1.5px solid var(--shell-edge); background: var(--shell);
+  cursor: default; user-select: text; -webkit-user-select: text;
+}
+.note[hidden] { display: none; }
+.note::before {
+  content: ''; flex: none; width: 10px; height: 10px; margin-top: 4px; border-radius: 50%;
+  background: var(--lit);
+}
+.note[data-kind="warn"] { border-color: #e8590c; }
+.note[data-kind="warn"]::before { background: #e8590c; }
+.note[data-kind="idle"]::before { background: var(--shell-edge); }
+</style>
+</head>
+<body>
+<div class="ui tabs" role="tablist" aria-label="Test type">
+  <button id="tab-mouse" role="tab" type="button" aria-selected="true" aria-controls="view-mouse">Mouse</button>
+  <button id="tab-keyboard" role="tab" type="button" aria-selected="false" aria-controls="view-keyboard">Keyboard</button>
+  <button id="tab-dpi" role="tab" type="button" aria-selected="false" aria-controls="view-dpi">DPI</button>
+  <button id="tab-sound" role="tab" type="button" aria-selected="false" aria-controls="view-sound">Sound</button>
+  <button id="tab-about" role="tab" type="button" aria-selected="false" aria-controls="view-about">About</button>
+</div>
+<section id="view-mouse" class="view" role="tabpanel" aria-labelledby="tab-mouse">
+<svg id="mouse" viewBox="0 0 340 310" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Mouse button tester. Press any button or scroll the wheel to light it up.">
+  <defs>
+    <path id="ol" class="ol" d="M60 270C60 120 120 30 200 30S340 120 340 270V440C340 550 280 630 200 630S60 550 60 440Z"/>
+    <path id="wh" class="ol" d="M188 136a12 12 0 0 1 24 0V178a12 12 0 0 1 -24 0Z"/>
+    <rect id="tab-a" class="ol" x="42" y="292" width="22" height="54" rx="8"/>
+    <rect id="tab-b" class="ol" x="42" y="356" width="22" height="54" rx="8"/>
+    <clipPath id="body-clip"><path d="M60 270C60 120 120 30 200 30S340 120 340 270V440C340 550 280 630 200 630S60 550 60 440Z"/></clipPath>
+  </defs>
+
+  <!-- body wall (thickness) -->
+  <use href="#ol" class="band-edge" transform="translate(0 22) matrix(0.61 0.153 -0.276 0.376 145 0)"/><use href="#ol" class="band-edge" transform="translate(0 20) matrix(0.61 0.153 -0.276 0.376 145 0)"/><use href="#ol" class="band-edge" transform="translate(0 18) matrix(0.61 0.153 -0.276 0.376 145 0)"/><use href="#ol" class="band-edge" transform="translate(0 16) matrix(0.61 0.153 -0.276 0.376 145 0)"/><use href="#ol" class="band-edge" transform="translate(0 14) matrix(0.61 0.153 -0.276 0.376 145 0)"/><use href="#ol" class="band-edge" transform="translate(0 12) matrix(0.61 0.153 -0.276 0.376 145 0)"/><use href="#ol" class="band-edge" transform="translate(0 10) matrix(0.61 0.153 -0.276 0.376 145 0)"/><use href="#ol" class="band-edge" transform="translate(0 8) matrix(0.61 0.153 -0.276 0.376 145 0)"/><use href="#ol" class="band-edge" transform="translate(0 6) matrix(0.61 0.153 -0.276 0.376 145 0)"/><use href="#ol" class="band-edge" transform="translate(0 4) matrix(0.61 0.153 -0.276 0.376 145 0)"/><use href="#ol" class="band-edge" transform="translate(0 2) matrix(0.61 0.153 -0.276 0.376 145 0)"/><use href="#ol" class="band-edge" transform="translate(0 0) matrix(0.61 0.153 -0.276 0.376 145 0)"/><use href="#ol" class="band-fill" transform="translate(0 22) matrix(0.61 0.153 -0.276 0.376 145 0)"/><use href="#ol" class="band-fill" transform="translate(0 20) matrix(0.61 0.153 -0.276 0.376 145 0)"/><use href="#ol" class="band-fill" transform="translate(0 18) matrix(0.61 0.153 -0.276 0.376 145 0)"/><use href="#ol" class="band-fill" transform="translate(0 16) matrix(0.61 0.153 -0.276 0.376 145 0)"/><use href="#ol" class="band-fill" transform="translate(0 14) matrix(0.61 0.153 -0.276 0.376 145 0)"/><use href="#ol" class="band-fill" transform="translate(0 12) matrix(0.61 0.153 -0.276 0.376 145 0)"/><use href="#ol" class="band-fill" transform="translate(0 10) matrix(0.61 0.153 -0.276 0.376 145 0)"/><use href="#ol" class="band-fill" transform="translate(0 8) matrix(0.61 0.153 -0.276 0.376 145 0)"/><use href="#ol" class="band-fill" transform="translate(0 6) matrix(0.61 0.153 -0.276 0.376 145 0)"/><use href="#ol" class="band-fill" transform="translate(0 4) matrix(0.61 0.153 -0.276 0.376 145 0)"/><use href="#ol" class="band-fill" transform="translate(0 2) matrix(0.61 0.153 -0.276 0.376 145 0)"/><use href="#ol" class="band-fill" transform="translate(0 0) matrix(0.61 0.153 -0.276 0.376 145 0)"/>
+  <!-- grip ridges on the visible right wall -->
+  <path class="ridge" d="M270.8 169.8L268.8 180.8M267.2 174.7L265.2 185.7M263.6 179.6L261.6 190.6M260.0 184.5L258.0 195.5M256.5 189.4L254.5 200.4M252.9 194.3L250.9 205.3M249.3 199.1L247.3 210.1M245.7 204.0L243.7 215.0M242.1 208.9L240.1 219.9M238.5 213.8L236.5 224.8M234.9 218.7L232.9 229.7"/>
+  <!-- thumb buttons: 5 forward, 4 back -->
+  <use href="#tab-a" class="band-edge" transform="translate(0 6) matrix(0.61 0.153 -0.276 0.376 145 0)"/><use href="#tab-a" class="band-edge" transform="translate(0 4) matrix(0.61 0.153 -0.276 0.376 145 0)"/><use href="#tab-a" class="band-edge" transform="translate(0 2) matrix(0.61 0.153 -0.276 0.376 145 0)"/><use href="#tab-a" class="band-edge" transform="translate(0 0) matrix(0.61 0.153 -0.276 0.376 145 0)"/><use href="#tab-a" class="band-fill" transform="translate(0 6) matrix(0.61 0.153 -0.276 0.376 145 0)"/><use href="#tab-a" class="band-fill" transform="translate(0 4) matrix(0.61 0.153 -0.276 0.376 145 0)"/><use href="#tab-a" class="band-fill" transform="translate(0 2) matrix(0.61 0.153 -0.276 0.376 145 0)"/><use href="#tab-a" class="band-fill" transform="translate(0 0) matrix(0.61 0.153 -0.276 0.376 145 0)"/><use href="#tab-b" class="band-edge" transform="translate(0 6) matrix(0.61 0.153 -0.276 0.376 145 0)"/><use href="#tab-b" class="band-edge" transform="translate(0 4) matrix(0.61 0.153 -0.276 0.376 145 0)"/><use href="#tab-b" class="band-edge" transform="translate(0 2) matrix(0.61 0.153 -0.276 0.376 145 0)"/><use href="#tab-b" class="band-edge" transform="translate(0 0) matrix(0.61 0.153 -0.276 0.376 145 0)"/><use href="#tab-b" class="band-fill" transform="translate(0 6) matrix(0.61 0.153 -0.276 0.376 145 0)"/><use href="#tab-b" class="band-fill" transform="translate(0 4) matrix(0.61 0.153 -0.276 0.376 145 0)"/><use href="#tab-b" class="band-fill" transform="translate(0 2) matrix(0.61 0.153 -0.276 0.376 145 0)"/><use href="#tab-b" class="band-fill" transform="translate(0 0) matrix(0.61 0.153 -0.276 0.376 145 0)"/>
+  <g transform="matrix(0.61 0.153 -0.276 0.376 145 0)">
+    <rect id="b4" class="part" x="42" y="292" width="22" height="54" rx="8"/>
+    <rect id="b3" class="part" x="42" y="356" width="22" height="54" rx="8"/>
+    <!-- top face -->
+    <use href="#ol" class="body-top"/>
+    <g clip-path="url(#body-clip)">
+      <rect id="b0" class="part btn" x="0" y="0" width="197" height="262"/>
+      <rect id="b2" class="part btn" x="203" y="0" width="200" height="262"/>
+    </g>
+    <path class="ln" d="M200 34V120M200 196V262M60 262Q200 246 340 262"/>
+    <use href="#ol" class="edge"/>
+    <path class="recess" d="M182 134a18 18 0 0 1 36 0V180a18 18 0 0 1 -36 0Z"/>
+    <path id="up" class="arrow" d="M200 44L222 82H209V114H191V82H178Z"/>
+    <path id="down" class="arrow" d="M191 204H209V236H222L200 274L178 236H191Z"/>
+  </g>
+  <!-- raised scroll wheel (middle button) -->
+  <use href="#wh" class="band-edge" transform="translate(0 0) matrix(0.61 0.153 -0.276 0.376 145 0)"/><use href="#wh" class="band-edge" transform="translate(0 -2) matrix(0.61 0.153 -0.276 0.376 145 0)"/><use href="#wh" class="band-edge" transform="translate(0 -4) matrix(0.61 0.153 -0.276 0.376 145 0)"/><use href="#wh" class="band-edge" transform="translate(0 -6) matrix(0.61 0.153 -0.276 0.376 145 0)"/><use href="#wh" class="band-edge" transform="translate(0 -8) matrix(0.61 0.153 -0.276 0.376 145 0)"/><use href="#wh" class="band-fill" transform="translate(0 0) matrix(0.61 0.153 -0.276 0.376 145 0)"/><use href="#wh" class="band-fill" transform="translate(0 -2) matrix(0.61 0.153 -0.276 0.376 145 0)"/><use href="#wh" class="band-fill" transform="translate(0 -4) matrix(0.61 0.153 -0.276 0.376 145 0)"/><use href="#wh" class="band-fill" transform="translate(0 -6) matrix(0.61 0.153 -0.276 0.376 145 0)"/><use href="#wh" class="band-fill" transform="translate(0 -8) matrix(0.61 0.153 -0.276 0.376 145 0)"/>
+  <g transform="translate(0 -8)"><g transform="matrix(0.61 0.153 -0.276 0.376 145 0)">
+    <path id="b1" class="part wheel" d="M188 136a12 12 0 0 1 24 0V178a12 12 0 0 1 -24 0Z"/>
+    <path class="ln" d="M188 142H212M188 148H212M188 154H212M188 160H212M188 166H212M188 172H212"/>
+  </g></g>
+</svg>
+</section>
+<section id="view-keyboard" class="view" role="tabpanel" aria-labelledby="tab-keyboard" hidden>
+<svg id="kb" viewBox="-50 -50 2350 790" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Keyboard tester. Press any key to light it up."></svg>
+</section>
+<section id="view-dpi" class="view view-about" role="tabpanel" aria-labelledby="tab-dpi" hidden>
+<div class="about" tabindex="0">
+<div class="ab-inner">
+<header>
+  <h1>Mouse DPI test</h1>
+  <p class="ab-lead">Measure how many counts your mouse reports for a distance you choose, and get its DPI.</p>
+</header>
+<section>
+  <h2>How to measure</h2>
+  <ol>
+    <li>Lay a ruler on your desk and rest the mouse at the 0 mark.</li>
+    <li>Pick the distance you will move it, then press <strong>Start</strong>. The cursor is captured so it cannot hit the screen edge.</li>
+    <li>Slide the mouse in a straight line to that mark, then press <strong>Space</strong> or click to stop.</li>
+  </ol>
+  <div class="dpi-controls">
+    <label for="dpi-dist">Distance</label>
+    <input id="dpi-dist" type="number" min="0.5" step="0.5" value="2" inputmode="decimal">
+    <select id="dpi-unit" aria-label="Unit">
+      <option value="in">inches</option>
+      <option value="cm">centimeters</option>
+    </select>
+    <button id="dpi-start" class="toggle dpi-start" type="button">Start</button>
+  </div>
+  <div id="dpi-pad" class="dpi-pad" tabindex="-1">
+    <p id="dpi-state" class="dpi-state">Ready. Press Start.</p>
+    <p id="dpi-big" class="dpi-big" aria-live="polite">&ndash;</p>
+    <p id="dpi-sub" class="ab-muted"></p>
+  </div>
+</section>
+<section>
+  <h2>Your runs</h2>
+  <ol id="dpi-runs" class="dpi-runs"><li class="ab-muted">No runs yet.</li></ol>
+  <p id="dpi-sum" class="ab-muted"></p>
+</section>
+<section>
+  <h2>For an accurate result</h2>
+  <ul>
+    <li>Use a longer distance. Moving 4 inches (10 cm) is more accurate than 1 inch, because a small error in where you stop matters less.</li>
+    <li>Keep the movement straight and at a steady speed. Do two or three runs and compare them.</li>
+    <li>Turn off pointer acceleration (on Windows, untick &ldquo;Enhance pointer precision&rdquo;), because it changes how far the cursor moves.</li>
+    <li>This is an estimate. Browsers report movement in screen pixels, so display scaling and system pointer settings can shift the number. A result within about 5% of a common setting such as 800 or 1600 is a match.</li>
+  </ul>
+</section>
+</div>
+</div>
+</section>
+<section id="view-sound" class="view view-about" role="tabpanel" aria-labelledby="tab-sound" hidden>
+<div class="about" tabindex="0">
+<div class="ab-inner">
+<header>
+  <h1>Sound test</h1>
+  <p class="ab-lead">Check that your left and right speakers work, then check that your microphone hears you.</p>
+</header>
+<section>
+  <h2>Speakers and headphones</h2>
+  <p>Turn the volume down a little first, then press a button. You should hear three beeps from the side you chose.</p>
+  <div class="snd-row">
+    <label for="snd-out">Output</label>
+    <select id="snd-out"><option value="">Default output</option></select>
+  </div>
+  <div class="snd-row">
+    <label for="snd-vol">Volume</label>
+    <input id="snd-vol" type="range" min="0" max="100" value="30">
+    <output id="snd-vol-out" for="snd-vol">30%</output>
+  </div>
+  <div class="snd-grid">
+    <button id="snd-l" class="toggle snd-btn" type="button"><span class="snd-big">L</span><span>Left</span></button>
+    <button id="snd-both" class="toggle snd-btn" type="button"><span class="snd-big">L+R</span><span>Both</span></button>
+    <button id="snd-r" class="toggle snd-btn" type="button"><span class="snd-big">R</span><span>Right</span></button>
+  </div>
+  <div class="snd-row">
+    <button id="snd-all" class="toggle" type="button">Play left, right, both</button>
+    <button id="snd-stop" class="toggle" type="button">Stop</button>
+  </div>
+  <p id="snd-out-note" class="ab-muted" aria-live="polite">Nothing playing.</p>
+</section>
+<section>
+  <h2>Microphone</h2>
+  <div class="snd-row">
+    <label for="snd-in">Input</label>
+    <select id="snd-in"><option value="">Default microphone</option></select>
+  </div>
+  <label class="snd-check"><input id="snd-raw" type="checkbox" checked> <span>Turn off noise suppression, echo cancellation and automatic gain, for a truer test</span></label>
+  <div class="snd-row">
+    <button id="snd-mic" class="toggle dpi-start" type="button">Start microphone</button>
+  </div>
+  <div id="snd-meter" class="snd-meter" role="meter" aria-label="Microphone level" aria-valuemin="-60" aria-valuemax="0" aria-valuenow="-60">
+    <div id="snd-fill" class="snd-fill"></div><div id="snd-peak" class="snd-peak"></div>
+  </div>
+  <p id="snd-level" class="snd-level">Microphone is off.</p>
+  <div class="snd-row">
+    <button id="snd-rec" class="toggle" type="button" disabled>Record 5 seconds</button>
+    <button id="snd-play" class="toggle" type="button" disabled>Play back</button>
+  </div>
+  <p id="snd-mic-note" class="ab-muted" aria-live="polite"></p>
+</section>
+<section>
+  <h2>Tips</h2>
+  <ul>
+    <li>Use headphones when you record and play back, or the speakers will feed back into the microphone. The live level is never sent to the speakers.</li>
+    <li>If one side is silent, check the balance in your system sound settings and the cable or Bluetooth connection, then try another app.</li>
+    <li>Device names appear after you allow the microphone. Choosing a different output works in Chrome, Edge and other Chromium browsers.</li>
+    <li>Nothing is uploaded. The recording stays in memory and is discarded when you leave this tab, press Reset or close the page.</li>
+    <li>The Windows, macOS and Linux apps ask for microphone permission each time they open.</li>
+  </ul>
+</section>
+</div>
+</div>
+</section>
+<section id="view-about" class="view view-about" role="tabpanel" aria-labelledby="tab-about" hidden>
+<div class="about" tabindex="0">
+<div class="ab-inner">
+
+<header>
+  <h1>Mouse and Keyboard Test</h1>
+  <p class="ab-lead">A free tool that checks every mouse button, the scroll wheel and every key on your keyboard, on your own computer.</p>
+  <p class="ab-muted">Version 1.2.0 &middot; November 2026</p>
+</header>
+
+<section>
+  <h2>About the software</h2>
+  <p>Press a button or a key and the matching part of the drawing lights up. Parts you have already tested keep a lighter tint, so you can see what is left to check. It is made for anyone who has just bought a mouse or keyboard, or suspects one is failing.</p>
+  <ul>
+    <li><strong>Mouse:</strong> left, right and middle buttons, plus the back and forward side buttons.</li>
+    <li><strong>Scroll wheel:</strong> up and down arrows light up, with a count for each direction.</li>
+    <li><strong>Keyboard:</strong> the full 104-key layout, with a running count of keys tested.</li>
+    <li><strong>DPI:</strong> measures your mouse's DPI. Move it a distance you set with a ruler and the test counts how far the mouse reports moving.</li>
+    <li><strong>Sound:</strong> plays a test tone through the left speaker, the right speaker or both, and shows a live level for any microphone you choose, with a short record and play back.</li>
+    <li><strong>Problem notes:</strong> warns when a button or key registers two presses in under 60 ms, when the wheel suddenly reverses direction, and when nothing has been pressed for a few seconds.</li>
+    <li><strong>Extras:</strong> a Reset button for each test and a light and dark mode.</li>
+  </ul>
+  <dl class="ab-specs">
+    <dt>Version</dt><dd>1.2.0</dd>
+    <dt>Released</dt><dd>November 2026</dd>
+    <dt>Available for</dt><dd>Web browsers, Windows 10 and 11, macOS and Linux</dd>
+    <dt>Works with</dt><dd>Any wired, wireless or Bluetooth mouse and keyboard that your system recognizes</dd>
+    <dt>Price</dt><dd>Free</dd>
+    <dt>Data collected</dt><dd>None</dd>
+  </dl>
+  <p class="ab-muted">Your operating system and browser can reserve some keys (for example the Windows key or Ctrl+W). A key that does not light up may be reserved by the system, so test it in another program before deciding it is broken.</p>
+</section>
+
+<section>
+  <h2>Developer</h2>
+  <p><strong>Shinjuu</strong><br>Designer and developer</p>
+  <div class="ab-contact">
+    <a id="dev-email" href="mailto:fsociety.shinjuu@gmail.com">fsociety.shinjuu@gmail.com</a>
+    <button id="copy-email" class="toggle copy" type="button">Copy email</button>
+  </div>
+  <p>Questions, bug reports and ideas for new tests are welcome.</p>
+  <p class="ab-muted">Copyright &copy; 2026 Shinjuu. All rights reserved.</p>
+</section>
+
+<section>
+  <h2>Credits</h2>
+  <ul>
+    <li>Designed and developed by Shinjuu.</li>
+    <li>Built with the help of Claude, an AI assistant made by Anthropic.</li>
+    <li>Inspired by the mouse and keyboard tests at onlinemictest.com. This software is independent and has no affiliation with Online Mic Test, and it uses none of its code or artwork.</li>
+    <li>The Windows, macOS and Linux apps open this page in your installed Microsoft Edge, Google Chrome or another Chromium-based browser. The small launcher that does this is written in Go.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Terms and conditions</h2>
+  <p class="ab-muted">Last updated 11 November 2026</p>
+  <ol>
+    <li><strong>Acceptance.</strong> By using Mouse and Keyboard Test, in the browser or as a downloaded app, you agree to these terms. If you do not agree, do not use it.</li>
+    <li><strong>License.</strong> The software is free to use for personal and business purposes, such as testing your own devices or devices you are checking for someone else. You may share the unmodified app and its link. You may not sell it, remove the credits, or present it as your own work. All rights not granted here stay with the developer.</li>
+    <li><strong>Results are a guide.</strong> The test reports the input your system passes to the page. The DPI figure is an estimate that depends on how carefully you measure the distance. It cannot tell the difference between a faulty device and a driver, browser or operating system setting that blocks the input. Do not rely on it as the only basis for a repair, return or warranty claim.</li>
+    <li><strong>No warranty.</strong> The software is provided "as is", without warranty of any kind, including fitness for a particular purpose and uninterrupted or error-free use.</li>
+    <li><strong>Limit of liability.</strong> To the extent the law allows, the developer is not liable for any loss or damage that comes from using or not being able to use the software, including loss of data, profit or hardware.</li>
+    <li><strong>Privacy.</strong> The test runs entirely on your device. It does not collect, store or send your key presses, clicks or any personal information. The microphone test listens only while you run it, only on your device. A recording stays in memory, is never uploaded, and is discarded when you leave the Sound tab, press Reset or close the page. The only thing it saves is your light or dark mode choice, kept on your own device. If you use the web version, the site that hosts it may keep its own technical logs under its own policies.</li>
+    <li><strong>Downloads.</strong> Download the apps only from the developer's official page. The apps are not code-signed, so Windows or macOS may show an unknown publisher warning the first time you open them.</li>
+    <li><strong>Changes.</strong> The software and these terms may be updated. Continued use after an update means you accept the new terms.</li>
+    <li><strong>Contact.</strong> For questions about these terms, write to fsociety.shinjuu@gmail.com.</li>
+  </ol>
+</section>
+
+</div>
+</div>
+</section>
+
+<div class="ui actions">
+  <button id="reset" class="toggle" type="button">Reset</button>
+  <button id="theme" class="toggle" type="button">Dark mode</button>
+</div>
+<div id="note" class="ui note" role="status" aria-live="polite" hidden></div>
+
+<script>
+(function () {
+  var root = document.documentElement;
+  var noteEl = document.getElementById('note');
+  var themeBtn = document.getElementById('theme');
+  var views = { mouse: document.getElementById('view-mouse'), keyboard: document.getElementById('view-keyboard'), dpi: document.getElementById('view-dpi'), sound: document.getElementById('view-sound'), about: document.getElementById('view-about') };
+  var tabBtns = { mouse: document.getElementById('tab-mouse'), keyboard: document.getElementById('tab-keyboard'), dpi: document.getElementById('tab-dpi'), sound: document.getElementById('tab-sound'), about: document.getElementById('tab-about') };
+  var active = 'mouse';
+
+  function isUi(e) { return e.target && e.target.closest && e.target.closest('.ui'); }
+  function mark(node, on) {
+    if (!node) return;
+    node.classList.toggle('on', on);
+    if (!on) node.classList.add('tested');
+    if (node.id === 'b1') {
+      node.style.fill = on ? 'var(--lit)' : (node.classList.contains('tested') ? 'var(--tested)' : 'var(--wheel)');
+    }
+  }
+  function releaseAll() {
+    Array.prototype.slice.call(document.querySelectorAll('.on')).forEach(function (n) { mark(n, false); });
+  }
+
+  /* ---------- notes: double press and no press ---------- */
+  var WORDS = {
+    mouse: { noun: 'button', act: 'clicked', dbl: 'click', chatter: 'double-click chatter',
+      idle0: 'No click or scroll detected yet. Press any button or turn the wheel. If nothing lights up, that part may not be working.',
+      idleN: 'No click or scroll detected for the last 6 seconds.' },
+    keyboard: { noun: 'key', act: 'pressed', dbl: 'press', chatter: 'key chatter',
+      idle0: 'No key press detected yet. Press any key on your keyboard. If a key does not light up, it may not be working.',
+      idleN: 'No key press detected for the last 6 seconds.' }
+  };
+  var tr = {
+    mouse: { last: {}, presses: 0, doubles: 0, faults: 0, timer: null, text: '', kind: '' },
+    keyboard: { last: {}, presses: 0, doubles: 0, faults: 0, timer: null, text: '', kind: '' },
+    dpi: { last: {}, presses: 0, doubles: 0, faults: 0, timer: null, text: '', kind: '' },
+    sound: { last: {}, presses: 0, doubles: 0, faults: 0, timer: null, text: '', kind: '' },
+    about: { last: {}, presses: 0, doubles: 0, faults: 0, timer: null, text: '', kind: '' }
+  };
+  function showNote(t) {
+    if (!t.text) { noteEl.hidden = true; return; }
+    noteEl.hidden = false;
+    noteEl.setAttribute('data-kind', t.kind);
+    noteEl.textContent = t.text;
+  }
+  function say(name, text, kind) {
+    tr[name].text = text; tr[name].kind = kind;
+    if (active === name) showNote(tr[name]);
+  }
+  function armIdle(name) {
+    var t = tr[name];
+    clearTimeout(t.timer);
+    if (active !== name || !WORDS[name]) return;
+    t.timer = setTimeout(function () {
+      say(name, t.presses === 0 ? WORDS[name].idle0 : WORDS[name].idleN, 'idle');
+    }, t.presses === 0 ? 4000 : 6000);
+  }
+  function register(name, id, label, extra) {
+    var t = tr[name], w = WORDS[name];
+    var now = performance.now(), prev = t.last[id];
+    var gap = prev === undefined ? null : Math.round(now - prev);
+    t.last[id] = now; t.presses++;
+    extra = extra || '';
+    if (gap !== null && gap < 60) {
+      t.faults++;
+      say(name, label + ' ' + w.noun + ' registered 2 presses ' + gap + ' ms apart. One press should not do that, so the switch may be faulty (' + w.chatter + '). Occurrences: ' + t.faults + '.' + extra, 'warn');
+    } else if (gap !== null && gap <= 400) {
+      t.doubles++;
+      say(name, 'Double ' + w.dbl + ' on the ' + label + ' ' + w.noun + ' (' + gap + ' ms apart). Double ' + w.dbl + 's so far: ' + t.doubles + '.' + extra, 'ok');
+    } else {
+      say(name, label + ' ' + w.noun + ' ' + w.act + '.' + extra, 'ok');
+    }
+    armIdle(name);
+  }
+
+  /* ---------- mouse ---------- */
+  var mel = {
+    0: document.getElementById('b0'), 1: document.getElementById('b1'), 2: document.getElementById('b2'),
+    3: document.getElementById('b3'), 4: document.getElementById('b4'),
+    up: document.getElementById('up'), down: document.getElementById('down')
+  };
+  var mnames = { 0: 'Left', 1: 'Middle', 2: 'Right', 3: 'Back', 4: 'Forward' };
+  var wheelTimers = {};
+  var scrollCount = { up: 0, down: 0 };
+  var lastScroll = { dir: null, t: 0 };
+  var scrollFlips = 0;
+  var runLen = 0;
+  // Browsers merge wheel events within one frame (about 16 ms), so a 1-3 ms reversal never reaches the page.
+  // A reversal inside this window, after a steady run in one direction, is reported as an error.
+  var FLIP_MS = 60;
+
+  window.addEventListener('mousedown', function (e) {
+    if (active !== 'mouse' || isUi(e)) return;
+    e.preventDefault();
+    mark(mel[e.button], true);
+    register('mouse', e.button, mnames[e.button] || ('Button ' + (e.button + 1)));
+  });
+  window.addEventListener('mouseup', function (e) {
+    if (active !== 'mouse' || isUi(e)) return;
+    e.preventDefault();
+    mark(mel[e.button], false);
+  });
+  window.addEventListener('auxclick', function (e) { if (!isUi(e)) e.preventDefault(); });
+  window.addEventListener('contextmenu', function (e) { if (active !== 'about' && active !== 'dpi' && active !== 'sound' && !isUi(e)) e.preventDefault(); });
+  window.addEventListener('wheel', function (e) {
+    if (active !== 'mouse') return;
+    e.preventDefault();
+    var key = e.deltaY < 0 ? 'up' : e.deltaY > 0 ? 'down' : null;
+    if (!key) return;
+    mark(mel[key], true);
+    scrollCount[key]++;
+    tr.mouse.presses++;
+    var gap = e.timeStamp - lastScroll.t;
+    var flip = lastScroll.dir && lastScroll.dir !== key && gap <= FLIP_MS && runLen >= 2;
+    runLen = lastScroll.dir === key ? runLen + 1 : 1;
+    lastScroll.dir = key; lastScroll.t = e.timeStamp;
+    if (flip) {
+      scrollFlips++;
+      say('mouse', 'Scroll error: while scrolling ' + (key === 'up' ? 'down' : 'up') + ', the wheel suddenly reported ' + key + ' (' + gap.toFixed(1) + ' ms apart). A hand cannot reverse that fast, so the wheel sensor may be faulty. Occurrences: ' + scrollFlips + '.', 'warn');
+    } else say('mouse', 'Scrolled ' + key + '. Scroll up: ' + scrollCount.up + ' tick' + (scrollCount.up === 1 ? '' : 's') + ', scroll down: ' + scrollCount.down + ' tick' + (scrollCount.down === 1 ? '' : 's') + '.', 'ok');
+    armIdle('mouse');
+    clearTimeout(wheelTimers[key]);
+    wheelTimers[key] = setTimeout(function () { mark(mel[key], false); }, 220);
+  }, { passive: false });
+  window.addEventListener('blur', releaseAll);
+
+  /* ---------- keyboard ---------- */
+  var NS = 'http://www.w3.org/2000/svg';
+  var kb = document.getElementById('kb');
+  var keys = {};
+  var testedKeys = {};
+  var total = 0;
+
+  function node(tag, attrs, parent) {
+    var n = document.createElementNS(NS, tag);
+    for (var a in attrs) n.setAttribute(a, attrs[a]);
+    if (parent) parent.appendChild(n);
+    return n;
+  }
+  var spec = [];
+  function add(code, label, x, y, w, h, name) { spec.push({ code: code, label: label, x: x, y: y, w: w || 1, h: h || 1, name: name || label || code }); }
+
+  add('Escape', 'Esc', 0, 0);
+  for (var i = 1; i <= 12; i++) add('F' + i, 'F' + i, i <= 4 ? 1 + i : i <= 8 ? 1.5 + i : 2 + i, 0);
+  add('PrintScreen', 'PrtSc', 15.25, 0); add('ScrollLock', 'ScrLk', 16.25, 0); add('Pause', 'Pause', 17.25, 0);
+
+  var r1 = [['Backquote', '`'], ['Digit1', '1'], ['Digit2', '2'], ['Digit3', '3'], ['Digit4', '4'], ['Digit5', '5'], ['Digit6', '6'], ['Digit7', '7'], ['Digit8', '8'], ['Digit9', '9'], ['Digit0', '0'], ['Minus', '-'], ['Equal', '=']];
+  var x = 0;
+  r1.forEach(function (k) { add(k[0], k[1], x++, 1.5); });
+  add('Backspace', 'Backspace', 13, 1.5, 2);
+
+  add('Tab', 'Tab', 0, 2.5, 1.5);
+  x = 1.5;
+  ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'].forEach(function (c) { add('Key' + c, c, x++, 2.5); });
+  add('BracketLeft', '[', x++, 2.5); add('BracketRight', ']', x++, 2.5);
+  add('Backslash', '\\', 13.5, 2.5, 1.5);
+
+  add('CapsLock', 'Caps', 0, 3.5, 1.75);
+  x = 1.75;
+  ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'].forEach(function (c) { add('Key' + c, c, x++, 3.5); });
+  add('Semicolon', ';', x++, 3.5); add('Quote', "'", x++, 3.5);
+  add('Enter', 'Enter', 12.75, 3.5, 2.25);
+
+  add('ShiftLeft', 'Shift', 0, 4.5, 2.25, 1, 'Left Shift');
+  x = 2.25;
+  ['Z', 'X', 'C', 'V', 'B', 'N', 'M'].forEach(function (c) { add('Key' + c, c, x++, 4.5); });
+  add('Comma', ',', x++, 4.5); add('Period', '.', x++, 4.5); add('Slash', '/', x++, 4.5);
+  add('ShiftRight', 'Shift', 12.25, 4.5, 2.75, 1, 'Right Shift');
+
+  add('ControlLeft', 'Ctrl', 0, 5.5, 1.25, 1, 'Left Ctrl');
+  add('MetaLeft', 'Win', 1.25, 5.5, 1.25, 1, 'Left Win');
+  add('AltLeft', 'Alt', 2.5, 5.5, 1.25, 1, 'Left Alt');
+  add('Space', '', 3.75, 5.5, 6.25, 1, 'Space');
+  add('AltRight', 'Alt', 10, 5.5, 1.25, 1, 'Right Alt');
+  add('MetaRight', 'Win', 11.25, 5.5, 1.25, 1, 'Right Win');
+  add('ContextMenu', 'Menu', 12.5, 5.5, 1.25);
+  add('ControlRight', 'Ctrl', 13.75, 5.5, 1.25, 1, 'Right Ctrl');
+
+  add('Insert', 'Ins', 15.25, 1.5); add('Home', 'Home', 16.25, 1.5); add('PageUp', 'PgUp', 17.25, 1.5);
+  add('Delete', 'Del', 15.25, 2.5); add('End', 'End', 16.25, 2.5); add('PageDown', 'PgDn', 17.25, 2.5);
+  add('ArrowUp', '↑', 16.25, 4.5, 1, 1, 'Up arrow');
+  add('ArrowLeft', '←', 15.25, 5.5, 1, 1, 'Left arrow');
+  add('ArrowDown', '↓', 16.25, 5.5, 1, 1, 'Down arrow');
+  add('ArrowRight', '→', 17.25, 5.5, 1, 1, 'Right arrow');
+
+  add('NumLock', 'Num', 18.5, 1.5, 1, 1, 'Num Lock');
+  add('NumpadDivide', '/', 19.5, 1.5, 1, 1, 'Numpad /');
+  add('NumpadMultiply', '*', 20.5, 1.5, 1, 1, 'Numpad *');
+  add('NumpadSubtract', '−', 21.5, 1.5, 1, 1, 'Numpad -');
+  add('Numpad7', '7', 18.5, 2.5, 1, 1, 'Numpad 7'); add('Numpad8', '8', 19.5, 2.5, 1, 1, 'Numpad 8'); add('Numpad9', '9', 20.5, 2.5, 1, 1, 'Numpad 9');
+  add('NumpadAdd', '+', 21.5, 2.5, 1, 2, 'Numpad +');
+  add('Numpad4', '4', 18.5, 3.5, 1, 1, 'Numpad 4'); add('Numpad5', '5', 19.5, 3.5, 1, 1, 'Numpad 5'); add('Numpad6', '6', 20.5, 3.5, 1, 1, 'Numpad 6');
+  add('Numpad1', '1', 18.5, 4.5, 1, 1, 'Numpad 1'); add('Numpad2', '2', 19.5, 4.5, 1, 1, 'Numpad 2'); add('Numpad3', '3', 20.5, 4.5, 1, 1, 'Numpad 3');
+  add('NumpadEnter', 'Enter', 21.5, 4.5, 1, 2, 'Numpad Enter');
+  add('Numpad0', '0', 18.5, 5.5, 2, 1, 'Numpad 0');
+  add('NumpadDecimal', '.', 20.5, 5.5, 1, 1, 'Numpad .');
+
+  total = spec.length;
+  node('rect', { class: 'kcase-wall', x: -30, y: -6, width: 2310, height: 700, rx: 36 }, kb);
+  node('rect', { class: 'kcase', x: -30, y: -30, width: 2310, height: 700, rx: 36 }, kb);
+  spec.forEach(function (k) {
+    var kx = k.x * 100 + 6, ky = k.y * 100 + 4, kw = k.w * 100 - 12, kh = k.h * 100 - 12;
+    var g = node('g', { class: 'key', 'data-code': k.code }, kb);
+    node('rect', { class: 'kwall', x: kx, y: ky + 9, width: kw, height: kh, rx: 14 }, g);
+    var cg = node('g', { class: 'cap-g' }, g);
+    node('rect', { class: 'kcap', x: kx, y: ky, width: kw, height: kh, rx: 14 }, cg);
+    if (k.label) {
+      var t = node('text', { class: 'klabel', x: kx + kw / 2, y: ky + kh / 2, 'font-size': k.label.length > 1 ? 24 : 36 }, cg);
+      t.textContent = k.label;
+    }
+    keys[k.code] = { g: g, name: k.name };
+  });
+
+  function testedCount() { return Object.keys(testedKeys).length; }
+
+  window.addEventListener('keydown', function (e) {
+    if (active === 'about' || active === 'dpi' || active === 'sound') return;
+    if (active === 'mouse') {
+      if ((e.key === 'f' || e.key === 'F') && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        try {
+          if (document.fullscreenElement) { document.exitFullscreen(); }
+          else { document.documentElement.requestFullscreen().catch(function () {}); }
+        } catch (err) {}
+      }
+      return;
+    }
+    e.preventDefault();
+    var k = keys[e.code];
+    if (!k) {
+      if (!e.repeat) { say('keyboard', 'This key is not shown on the keyboard (code: ' + (e.code || e.key) + ').', 'ok'); armIdle('keyboard'); }
+      return;
+    }
+    mark(k.g, true);
+    testedKeys[e.code] = true;
+    if (!e.repeat) register('keyboard', e.code, k.name, ' Tested ' + testedCount() + ' of ' + total + ' keys.');
+  });
+  window.addEventListener('keyup', function (e) {
+    if (active !== 'keyboard') return;
+    e.preventDefault();
+    var k = keys[e.code];
+    if (!k) return;
+    if (!k.g.classList.contains('on') && e.code === 'PrintScreen') {
+      // some systems only report this key on release
+      mark(k.g, true);
+      testedKeys[e.code] = true;
+      register('keyboard', e.code, k.name, ' Tested ' + testedCount() + ' of ' + total + ' keys.');
+      setTimeout(function () { mark(k.g, false); }, 180);
+      return;
+    }
+    mark(k.g, false);
+  });
+
+  /* ---------- mouse DPI ---------- */
+  var COMMON_DPI = [200, 400, 500, 600, 800, 1000, 1200, 1600, 2000, 2400, 3200, 4000, 4800, 6400, 8000, 12000, 16000, 20000, 26000, 30000];
+  var dEl = {
+    dist: document.getElementById('dpi-dist'), unit: document.getElementById('dpi-unit'),
+    start: document.getElementById('dpi-start'), pad: document.getElementById('dpi-pad'),
+    state: document.getElementById('dpi-state'), big: document.getElementById('dpi-big'), sub: document.getElementById('dpi-sub'),
+    runs: document.getElementById('dpi-runs'), sum: document.getElementById('dpi-sum')
+  };
+  var dpi = { measuring: false, locked: false, legacy: false, sx: 0, sy: 0, runs: [], last: null };
+  function fmtN(n) { return Math.round(n).toLocaleString('en-US'); }
+  function distLabel() {
+    var d = parseFloat(dEl.dist.value);
+    return d + (dEl.unit.value === 'cm' ? ' cm' : (d === 1 ? ' inch' : ' inches'));
+  }
+  function inchesMoved() {
+    var d = parseFloat(dEl.dist.value);
+    if (!(d > 0)) return 0;
+    return dEl.unit.value === 'cm' ? d / 2.54 : d;
+  }
+  function nearestCommon(v) {
+    var best = COMMON_DPI[0];
+    COMMON_DPI.forEach(function (c) { if (Math.abs(Math.log(v / c)) < Math.abs(Math.log(v / best))) best = c; });
+    return best;
+  }
+  function dpiPaint() {
+    dEl.pad.classList.toggle('live', dpi.measuring);
+    dEl.start.disabled = dpi.measuring;
+    dEl.start.textContent = dpi.measuring ? 'Measuring' : 'Start';
+    if (dpi.measuring) {
+      dEl.state.textContent = 'Move the mouse ' + distLabel() + ' along the ruler, then press Space or click to stop.';
+      dEl.big.innerHTML = fmtN(Math.hypot(dpi.sx, dpi.sy)) + '<small>counts</small>';
+      dEl.sub.textContent = '';
+    } else if (dpi.last) {
+      dEl.state.textContent = 'Last run';
+      dEl.big.innerHTML = fmtN(dpi.last.dpi) + '<small>DPI</small>';
+      var near = nearestCommon(dpi.last.dpi);
+      var off = Math.round(Math.abs(dpi.last.dpi - near) / near * 100);
+      dEl.sub.textContent = fmtN(dpi.last.counts) + ' counts over ' + dpi.last.label + '. Closest common setting: ' + fmtN(near) + ' DPI' + (off === 0 ? '.' : ' (' + off + '% away).');
+    } else {
+      dEl.state.textContent = 'Ready. Press Start.';
+      dEl.big.innerHTML = '&ndash;';
+      dEl.sub.textContent = '';
+    }
+    dEl.runs.innerHTML = '';
+    if (!dpi.runs.length) {
+      var li = document.createElement('li'); li.className = 'ab-muted'; li.textContent = 'No runs yet.'; dEl.runs.appendChild(li);
+      dEl.sum.textContent = '';
+    } else {
+      dpi.runs.forEach(function (r) {
+        var item = document.createElement('li');
+        item.textContent = fmtN(r.dpi) + ' DPI (' + fmtN(r.counts) + ' counts over ' + r.label + ')';
+        dEl.runs.appendChild(item);
+      });
+      var vals = dpi.runs.map(function (r) { return r.dpi; });
+      var avg = vals.reduce(function (a, b) { return a + b; }, 0) / vals.length;
+      if (vals.length < 2) { dEl.sum.textContent = 'Do at least one more run to check that the result is steady.'; }
+      else {
+        var spread = (Math.max.apply(null, vals) - Math.min.apply(null, vals)) / avg * 100;
+        dEl.sum.textContent = 'Average of ' + vals.length + ' runs: ' + fmtN(avg) + ' DPI. Runs differ by ' + spread.toFixed(1) + '%' +
+          (spread > 5 ? '. That is more than 5%, so try a longer, straighter movement.' : '. That is steady.');
+      }
+    }
+  }
+  function noLock() {
+    if (dpi.measuring) say('dpi', 'Your browser did not allow pointer capture, so the cursor stays visible and the system may adjust its speed. Measuring anyway. The result may be less accurate.', 'warn');
+  }
+  function requestLock() {
+    var p = null;
+    try { p = dEl.pad.requestPointerLock({ unadjustedMovement: true }); } catch (err) { p = null; }
+    if (p && typeof p.then === 'function') {
+      p.catch(function () {
+        if (!dpi.measuring) return;
+        try { var q = dEl.pad.requestPointerLock(); if (q && typeof q.catch === 'function') q.catch(noLock); } catch (err) { noLock(); }
+      });
+    } else { dpi.legacy = true; }
+  }
+  function releaseLock() { try { if (document.pointerLockElement) document.exitPointerLock(); } catch (err) {} }
+  function startDpi() {
+    if (dpi.measuring) return;
+    if (!(inchesMoved() > 0)) { say('dpi', 'Enter the distance you will move the mouse, for example 2 inches.', 'warn'); return; }
+    dpi.sx = 0; dpi.sy = 0; dpi.measuring = true; dpi.legacy = false;
+    dEl.start.blur();
+    say('dpi', 'Measuring. Move the mouse ' + distLabel() + ' in a straight line, then press Space or click.', 'ok');
+    dpiPaint();
+    requestLock();
+  }
+  function cancelDpi() {
+    if (!dpi.measuring) return;
+    dpi.measuring = false; releaseLock(); dpiPaint();
+  }
+  function finishDpi() {
+    if (!dpi.measuring) return;
+    dpi.measuring = false; releaseLock();
+    var counts = Math.hypot(dpi.sx, dpi.sy);
+    if (counts < 20) {
+      say('dpi', 'Almost no movement was measured. Press Start, move the mouse the whole distance in one straight line, then stop.', 'warn');
+      dpiPaint(); return;
+    }
+    var value = counts / inchesMoved();
+    var run = { dpi: value, counts: counts, label: distLabel() };
+    dpi.last = run; dpi.runs.push(run);
+    if (dpi.runs.length > 8) dpi.runs.shift();
+    say('dpi', 'Run ' + dpi.runs.length + ': about ' + fmtN(value) + ' DPI (' + fmtN(counts) + ' counts over ' + run.label + ').', 'ok');
+    dpiPaint();
+  }
+  dEl.start.addEventListener('click', startDpi);
+  dEl.dist.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); dEl.dist.blur(); startDpi(); } });
+  window.addEventListener('mousemove', function (e) {
+    if (!dpi.measuring) return;
+    dpi.sx += e.movementX || 0; dpi.sy += e.movementY || 0;
+    dEl.big.innerHTML = fmtN(Math.hypot(dpi.sx, dpi.sy)) + '<small>counts</small>';
+  });
+  window.addEventListener('mousedown', function (e) {
+    if (!dpi.measuring) return;
+    e.preventDefault(); finishDpi();
+  }, true);
+  window.addEventListener('keydown', function (e) {
+    if (!dpi.measuring || e.repeat) return;
+    if (e.key === ' ' || e.key === 'Enter' || e.key === 'Escape') { e.preventDefault(); finishDpi(); }
+  }, true);
+  document.addEventListener('pointerlockchange', function () {
+    if (document.pointerLockElement === dEl.pad) { dpi.locked = true; return; }
+    if (dpi.locked) { dpi.locked = false; if (dpi.measuring) finishDpi(); }
+  });
+  document.addEventListener('pointerlockerror', function () { if (dpi.legacy) noLock(); });
+  dpiPaint();
+
+  /* ---------- sound: speakers and microphone ---------- */
+  var AC = window.AudioContext || window.webkitAudioContext;
+  function byId(id) { return document.getElementById(id); }
+  var sn = {
+    out: byId('snd-out'), vol: byId('snd-vol'), volOut: byId('snd-vol-out'),
+    btn: { left: byId('snd-l'), right: byId('snd-r'), both: byId('snd-both') },
+    all: byId('snd-all'), stop: byId('snd-stop'), outNote: byId('snd-out-note'),
+    inp: byId('snd-in'), raw: byId('snd-raw'), mic: byId('snd-mic'), meter: byId('snd-meter'),
+    fill: byId('snd-fill'), peak: byId('snd-peak'), level: byId('snd-level'),
+    rec: byId('snd-rec'), play: byId('snd-play'), micNote: byId('snd-mic-note')
+  };
+  var PAN = { left: -1, right: 1, both: 0 };
+  var SIDE_WORDS = { left: 'the left side only', right: 'the right side only', both: 'both sides' };
+  var snd = { ctx: null, master: null, cur: null, timers: [] };
+  var micS = { stream: null, ctx: null, an: null, buf: null, raf: 0, rec: null, url: null, audio: null, pending: false, t0: 0, heard: false, warned: false, peak: -90, peakAt: 0, lastAria: 0 };
+
+  function sinkSupported() { return !!(AC && AC.prototype && typeof AC.prototype.setSinkId === 'function'); }
+  function volume() { return parseInt(sn.vol.value, 10) / 100 * 0.7; }
+  function dbOf(x) { return x > 0.000001 ? 20 * Math.log10(x) : -90; }
+  function fmtDb(db) { return db <= -89 ? '-inf' : String(Math.round(db)); }
+
+  function applySink() {
+    if (!snd.ctx || !sinkSupported()) return;
+    snd.ctx.setSinkId(sn.out.value || '').catch(function () {
+      say('sound', 'Could not switch to that output device. The previous one is still in use.', 'warn');
+    });
+  }
+  function ensureCtx() {
+    if (!AC) return false;
+    if (!snd.ctx) {
+      snd.ctx = new AC();
+      snd.master = snd.ctx.createGain();
+      snd.master.gain.value = volume();
+      snd.master.connect(snd.ctx.destination);
+      applySink();
+    }
+    if (snd.ctx.state === 'suspended') snd.ctx.resume();
+    return true;
+  }
+  function clearTimers() { snd.timers.forEach(clearTimeout); snd.timers = []; }
+  function stopTone() {
+    if (snd.cur) {
+      try { snd.cur.osc.stop(); } catch (err) {}
+      try { snd.cur.osc.disconnect(); snd.cur.env.disconnect(); if (snd.cur.pan) snd.cur.pan.disconnect(); } catch (err) {}
+      snd.cur = null;
+    }
+    Object.keys(sn.btn).forEach(function (k) { sn.btn[k].classList.remove('playing'); });
+  }
+  // Three beeps (440 Hz) in the chosen channel. Returns the length in seconds, or 0 if it cannot play.
+  function beep(side) {
+    stopTone();
+    if (!ensureCtx()) { sn.outNote.textContent = 'This browser cannot play test sounds.'; return 0; }
+    var c = snd.ctx;
+    var pan = c.createStereoPanner ? c.createStereoPanner() : null;
+    if (!pan && side !== 'both') { sn.outNote.textContent = 'This browser cannot play to one side only. Try Chrome or Edge.'; return 0; }
+    var t = c.currentTime + 0.03, osc = c.createOscillator(), env = c.createGain();
+    osc.type = 'sine'; osc.frequency.value = 440;
+    env.gain.setValueAtTime(0, t);
+    for (var i = 0; i < 3; i++) {
+      var s = t + i * 0.5;
+      env.gain.setValueAtTime(0, s);
+      env.gain.linearRampToValueAtTime(1, s + 0.03);
+      env.gain.setValueAtTime(1, s + 0.32);
+      env.gain.linearRampToValueAtTime(0, s + 0.36);
+    }
+    osc.connect(env);
+    if (pan) { pan.pan.value = PAN[side]; env.connect(pan); pan.connect(snd.master); } else { env.connect(snd.master); }
+    osc.start(t); osc.stop(t + 1.5);
+    snd.cur = { osc: osc, env: env, pan: pan };
+    sn.btn[side].classList.add('playing');
+    return 1.55;
+  }
+  function announce(side) {
+    var text = 'Playing ' + (side === 'both' ? 'both left and right' : side) + '. You should hear three beeps from ' + SIDE_WORDS[side] + '.';
+    sn.outNote.textContent = text; say('sound', text, 'ok');
+  }
+  function playSide(side) {
+    clearTimers();
+    var d = beep(side);
+    if (!d) return;
+    announce(side);
+    snd.timers.push(setTimeout(function () {
+      stopTone();
+      sn.outNote.textContent = 'Done. If you heard nothing, or the wrong side, see the tips below.';
+    }, d * 1000));
+  }
+  function playAll() {
+    clearTimers();
+    ['left', 'right', 'both'].forEach(function (side, i) {
+      function step() { if (beep(side)) announce(side); }
+      if (i === 0) step(); else snd.timers.push(setTimeout(step, i * 2000));
+    });
+    snd.timers.push(setTimeout(function () {
+      stopTone();
+      sn.outNote.textContent = 'Finished. You should have heard left, then right, then both.';
+    }, 5600));
+  }
+
+  /* devices */
+  function fillSelect(sel, devs, word, defLabel) {
+    var cur = sel.value, n = 0;
+    sel.innerHTML = '';
+    var o = document.createElement('option'); o.value = ''; o.textContent = defLabel; sel.appendChild(o);
+    devs.forEach(function (d) {
+      if (d.deviceId === 'default') return;
+      n++;
+      var opt = document.createElement('option');
+      opt.value = d.deviceId; opt.textContent = d.label || (word + ' ' + n);
+      sel.appendChild(opt);
+    });
+    sel.value = cur;
+    if (sel.value !== cur) sel.value = '';
+  }
+  function refreshDevices() {
+    var md = navigator.mediaDevices;
+    if (!md || !md.enumerateDevices) return;
+    md.enumerateDevices().then(function (list) {
+      fillSelect(sn.out, list.filter(function (d) { return d.kind === 'audiooutput'; }), 'Output', sinkSupported() ? 'Default output' : 'Default output (this browser cannot switch)');
+      fillSelect(sn.inp, list.filter(function (d) { return d.kind === 'audioinput'; }), 'Microphone', 'Default microphone');
+    }).catch(function () {});
+  }
+
+  /* microphone */
+  function micSay(text, kind) { sn.micNote.textContent = text; if (kind) say('sound', text, kind); }
+  function discardRecording() {
+    if (micS.audio) { try { micS.audio.pause(); } catch (err) {} micS.audio = null; }
+    if (micS.url) { URL.revokeObjectURL(micS.url); micS.url = null; }
+    sn.play.disabled = true;
+  }
+  function stopMic() {
+    cancelAnimationFrame(micS.raf); micS.raf = 0;
+    if (micS.rec && micS.rec.state === 'recording') { try { micS.rec.stop(); } catch (err) {} }
+    if (micS.stream) { micS.stream.getTracks().forEach(function (tk) { tk.stop(); }); micS.stream = null; }
+    if (micS.ctx) { try { micS.ctx.close(); } catch (err) {} micS.ctx = null; }
+    sn.mic.textContent = 'Start microphone'; sn.mic.disabled = micS.pending; sn.rec.disabled = true;
+    sn.fill.style.width = '0'; sn.fill.classList.remove('hot'); sn.peak.style.left = '0';
+    sn.level.textContent = 'Microphone is off.';
+    sn.meter.setAttribute('aria-valuenow', '-60');
+  }
+  function micLoop() {
+    if (!micS.stream) return;
+    var b = micS.buf, sum = 0, pk = 0, i, v;
+    micS.an.getFloatTimeDomainData(b);
+    for (i = 0; i < b.length; i++) { v = b[i]; sum += v * v; if (v < 0) v = -v; if (v > pk) pk = v; }
+    var db = dbOf(Math.sqrt(sum / b.length)), pdb = dbOf(pk), now = performance.now();
+    if (pdb > micS.peak || now - micS.peakAt > 1500) { micS.peak = pdb; micS.peakAt = now; }
+    if (db > -50) micS.heard = true;
+    sn.fill.style.width = Math.max(0, Math.min(100, (db + 60) / 60 * 100)) + '%';
+    sn.fill.classList.toggle('hot', pdb > -3);
+    sn.peak.style.left = Math.max(0, Math.min(99, (micS.peak + 60) / 60 * 100)) + '%';
+    var word = pdb > -1 ? 'too loud, may distort' : db < -50 ? 'silent' : db < -35 ? 'quiet' : db < -12 ? 'good' : 'loud';
+    sn.level.textContent = 'Level ' + fmtDb(db) + ' dB, peak ' + fmtDb(micS.peak) + ' dB, ' + word;
+    if (now - micS.lastAria > 250) { sn.meter.setAttribute('aria-valuenow', String(Math.round(Math.max(-60, db)))); micS.lastAria = now; }
+    if (!micS.heard && !micS.warned && now - micS.t0 > 4000) {
+      micS.warned = true;
+      micSay('No sound picked up for 4 seconds. Speak or clap. If the bar stays flat, check the mute switch and input volume, or choose another input.', 'warn');
+    }
+    micS.raf = requestAnimationFrame(micLoop);
+  }
+  function startMic() {
+    if (micS.stream || micS.pending) return;
+    var md = navigator.mediaDevices;
+    if (!md || !md.getUserMedia || !AC) { micSay('This browser cannot use the microphone here.', 'warn'); return; }
+    var raw = sn.raw.checked, a = { echoCancellation: !raw, noiseSuppression: !raw, autoGainControl: !raw };
+    if (sn.inp.value) a.deviceId = { exact: sn.inp.value };
+    micS.pending = true; sn.mic.disabled = true;
+    micSay('Waiting for permission. Allow the microphone in the prompt.', 'idle');
+    md.getUserMedia({ audio: a }).then(function (stream) {
+      micS.pending = false; sn.mic.disabled = false;
+      if (active !== 'sound') { stream.getTracks().forEach(function (tk) { tk.stop(); }); return; }
+      micS.stream = stream; micS.ctx = new AC();
+      var src = micS.ctx.createMediaStreamSource(stream), an = micS.ctx.createAnalyser();
+      an.fftSize = 2048; src.connect(an); // never connected to the speakers, so there is no echo
+      micS.an = an; micS.buf = new Float32Array(an.fftSize);
+      micS.t0 = performance.now(); micS.heard = false; micS.warned = false; micS.peak = -90; micS.peakAt = 0;
+      var track = stream.getAudioTracks()[0];
+      track.addEventListener('ended', function () {
+        if (micS.stream === stream) { stopMic(); micSay('The microphone was disconnected or stopped.', 'warn'); }
+      });
+      sn.mic.textContent = 'Stop microphone'; sn.rec.disabled = false;
+      micSay('Listening to ' + ((track && track.label) || 'your microphone') + '. Speak or clap and watch the bar.', 'ok');
+      refreshDevices();
+      micLoop();
+    }).catch(function (err) {
+      micS.pending = false; sn.mic.disabled = false;
+      var n = err && err.name;
+      micSay(
+        n === 'NotAllowedError' || n === 'SecurityError' ? 'Microphone access was blocked. Allow it in your browser (look near the address bar), then press Start again.' :
+        n === 'NotFoundError' || n === 'OverconstrainedError' ? 'No microphone was found. Plug one in or choose another input.' :
+        n === 'NotReadableError' ? 'The microphone is busy or unavailable. Close other apps that use it, then try again.' :
+        'The microphone could not start (' + (n || 'error') + ').', 'warn');
+    });
+  }
+  function recordFive() {
+    if (!micS.stream || micS.rec) return;
+    if (!window.MediaRecorder) { micSay('This browser cannot record.', 'warn'); return; }
+    discardRecording();
+    var chunks = [], r, left = 5;
+    try { r = new MediaRecorder(micS.stream); } catch (err) { micSay('Recording is not supported for this microphone.', 'warn'); return; }
+    micS.rec = r; sn.rec.disabled = true;
+    sn.rec.textContent = 'Recording ' + left + '...';
+    var tick = setInterval(function () { left--; if (left > 0) sn.rec.textContent = 'Recording ' + left + '...'; }, 1000);
+    r.ondataavailable = function (e) { if (e.data && e.data.size) chunks.push(e.data); };
+    r.onstop = function () {
+      clearInterval(tick); micS.rec = null;
+      sn.rec.textContent = 'Record 5 seconds'; sn.rec.disabled = !micS.stream;
+      if (chunks.length) {
+        micS.url = URL.createObjectURL(new Blob(chunks, { type: r.mimeType || 'audio/webm' }));
+        sn.play.disabled = false;
+        micSay('Recorded. Press Play back to hear yourself. Use headphones so the speakers do not feed back into the microphone.', 'ok');
+      }
+    };
+    r.start();
+    setTimeout(function () { if (r.state === 'recording') r.stop(); }, 5000);
+  }
+  function playBack() {
+    if (!micS.url) return;
+    if (micS.audio) { try { micS.audio.pause(); } catch (err) {} }
+    var a = new Audio(micS.url); micS.audio = a;
+    function go() { a.play().catch(function () { micSay('Playback was blocked. Press Play back again.', 'warn'); }); }
+    if (sn.out.value && typeof a.setSinkId === 'function') a.setSinkId(sn.out.value).then(go, go); else go();
+    micSay('Playing your recording.', 'ok');
+  }
+  function stopSound() {
+    clearTimers(); stopTone(); stopMic(); discardRecording();
+    sn.outNote.textContent = 'Nothing playing.'; sn.micNote.textContent = '';
+  }
+
+  Object.keys(sn.btn).forEach(function (side) { sn.btn[side].addEventListener('click', function () { playSide(side); }); });
+  sn.all.addEventListener('click', playAll);
+  sn.stop.addEventListener('click', function () { clearTimers(); stopTone(); sn.outNote.textContent = 'Stopped.'; });
+  sn.vol.addEventListener('input', function () {
+    sn.volOut.textContent = sn.vol.value + '%';
+    if (snd.master) snd.master.gain.value = volume();
+  });
+  sn.out.addEventListener('change', applySink);
+  sn.mic.addEventListener('click', function () {
+    if (micS.stream) { stopMic(); micSay('Microphone stopped.', 'idle'); } else startMic();
+  });
+  sn.inp.addEventListener('change', function () { if (micS.stream) { stopMic(); startMic(); } });
+  sn.rec.addEventListener('click', recordFive);
+  sn.play.addEventListener('click', playBack);
+  if (navigator.mediaDevices && navigator.mediaDevices.addEventListener) navigator.mediaDevices.addEventListener('devicechange', refreshDevices);
+  window.addEventListener('pagehide', function () { stopMic(); });
+  if (!sinkSupported()) sn.out.disabled = true;
+  refreshDevices();
+
+  /* ---------- reset ---------- */
+  function resetActive() {
+    var name = active;
+    if (name === 'about') return;
+    if (name === 'dpi') {
+      cancelDpi(); dpi.runs = []; dpi.last = null; dpi.sx = 0; dpi.sy = 0;
+      tr.dpi = { last: {}, presses: 0, doubles: 0, faults: 0, timer: null, text: '', kind: '' };
+      dpiPaint(); showNote(tr.dpi);
+      return;
+    }
+    if (name === 'sound') {
+      stopSound();
+      tr.sound = { last: {}, presses: 0, doubles: 0, faults: 0, timer: null, text: '', kind: '' };
+      showNote(tr.sound);
+      return;
+    }
+    clearTimeout(tr[name].timer);
+    Array.prototype.slice.call(views[name].querySelectorAll('.on, .tested')).forEach(function (n) {
+      n.classList.remove('on', 'tested');
+    });
+    tr[name] = { last: {}, presses: 0, doubles: 0, faults: 0, timer: null, text: '', kind: '' };
+    if (name === 'mouse') {
+      document.getElementById('b1').style.fill = '';
+      scrollCount = { up: 0, down: 0 };
+      lastScroll = { dir: null, t: 0 };
+      scrollFlips = 0;
+      runLen = 0;
+    } else {
+      testedKeys = {};
+    }
+    showNote(tr[name]);
+    armIdle(name);
+  }
+  document.getElementById('reset').addEventListener('click', resetActive);
+
+  /* ---------- tabs ---------- */
+  function show(name) {
+    clearTimeout(tr[active].timer);
+    releaseAll();
+    if (name !== 'dpi') cancelDpi();
+    if (name !== 'sound') stopSound();
+    active = name;
+    ['mouse', 'keyboard', 'dpi', 'sound', 'about'].forEach(function (n) {
+      views[n].hidden = n !== name;
+      tabBtns[n].setAttribute('aria-selected', n === name ? 'true' : 'false');
+    });
+    document.getElementById('reset').hidden = name === 'about';
+    showNote(tr[name]);
+    armIdle(name);
+  }
+  function fromHash() { return location.hash === '#keyboard' ? 'keyboard' : location.hash === '#dpi' ? 'dpi' : location.hash === '#sound' ? 'sound' : location.hash === '#about' ? 'about' : 'mouse'; }
+  ['mouse', 'keyboard', 'dpi', 'sound', 'about'].forEach(function (n) {
+    tabBtns[n].addEventListener('click', function () {
+      if (location.hash !== '#' + n) { location.hash = n; } else { show(n); }
+    });
+  });
+  window.addEventListener('hashchange', function () { show(fromHash()); });
+
+  /* ---------- light / dark ---------- */
+  var mq = window.matchMedia('(prefers-color-scheme: dark)');
+  function isDark() {
+    var t = root.getAttribute('data-theme');
+    return t ? t === 'dark' : mq.matches;
+  }
+  function paintToggle() { themeBtn.textContent = isDark() ? 'Light mode' : 'Dark mode'; }
+  try {
+    var saved = localStorage.getItem('mouse-test-theme');
+    if (saved === 'light' || saved === 'dark') root.setAttribute('data-theme', saved);
+  } catch (err) {}
+  themeBtn.addEventListener('click', function () {
+    var next = isDark() ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('mouse-test-theme', next); } catch (err) {}
+    paintToggle();
+  });
+  if (mq.addEventListener) mq.addEventListener('change', paintToggle);
+  paintToggle();
+
+  var copyBtn = document.getElementById('copy-email');
+  copyBtn.addEventListener('click', function () {
+    var addr = document.getElementById('dev-email').textContent;
+    function done() { copyBtn.textContent = 'Copied'; setTimeout(function () { copyBtn.textContent = 'Copy email'; }, 1600); }
+    function fallback() {
+      var r = document.createRange(); r.selectNodeContents(document.getElementById('dev-email'));
+      var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+      copyBtn.textContent = 'Press Ctrl+C';
+    }
+    try { navigator.clipboard.writeText(addr).then(done, fallback); } catch (err) { fallback(); }
+  });
+
+  show(fromHash());
+})();
+</script>
+</body>
+</html>
