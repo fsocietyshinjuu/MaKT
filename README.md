@@ -50,4 +50,8 @@ The desktop apps contain a copy of `app/index.html`, so rebuild them whenever th
 sha256sum downloads/*.zip
 ```
 
+## Support
+
+Mouse and Keyboard Test is free. Donation addresses and the developer's contact links are in the About tab of the app and on the website.
+
 Copyright (c) 2026 Shinjuu. All rights reserved. See the terms on the landing page.

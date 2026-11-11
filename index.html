@@ -132,6 +132,13 @@ section { min-width: 0; }
 .mail a { overflow-wrap: anywhere; }
 .btn.small { padding: 8px 14px; font-size: 13px; border-radius: 8px; }
 .muted { color: var(--muted); font-size: 14px; }
+.col .links, .col .pay { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.links li, .pay li { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; font-size: 15px; }
+.k { font-weight: 600; min-width: 5em; }
+.links a { overflow-wrap: anywhere; }
+.addr { font: 13px/1.4 var(--font-mono); overflow-wrap: anywhere; word-break: break-all; user-select: all; flex: 1 1 280px; min-width: 0; padding: 6px 10px; border: 1.5px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--ink); }
+.addr.short { flex: 0 1 auto; }
+@media (max-width: 520px) { .k { min-width: 100%; } }
 
 details.terms { border-top: 1.5px solid var(--ink); }
 details.terms summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 20px 0; font-size: 22px; font-weight: 700; }
@@ -175,7 +182,7 @@ footer { border-top: 1.5px solid var(--line); padding-top: 24px; display: flex; 
 
 <section class="hero" id="top">
   <div>
-    <p class="label">Free &middot; Version 1.2.0 &middot; Web, Windows, macOS, Linux</p>
+    <p class="label">Free &middot; Version 1.2.1 &middot; Web, Windows, macOS, Linux</p>
     <h1 style="margin-top:16px">Test every click and <span>every key.</span></h1>
     <p class="lead">Press a button or a key and its picture lights up. The test also warns you about double presses, missed presses and a scroll wheel that jumps backwards, it can measure your mouse DPI, and it tests your speakers and microphone. No account, and nothing leaves your computer.</p>
     <div class="cta">
@@ -285,7 +292,7 @@ footer { border-top: 1.5px solid var(--line); padding-top: 24px; display: flex; 
         <dt>Size</dt><dd>2.2 MB</dd>
         <dt>Needs</dt><dd>Windows 10 or 11 with Microsoft Edge or Chrome</dd>
       </dl>
-      <p class="sha">SHA-256 e8582de3785fb7e8b0a70964979ac0f4545984e19d6e173bb937d1f7a43649d3</p>
+      <p class="sha">SHA-256 ca39ab8ac9bf93aaa219f615d55ad938e7ec03d46181e771e847b9e17ef817b7</p>
       <a class="btn primary" href="downloads/MouseKeyboardTest-Windows.zip" download>Download for Windows</a>
     </article>
     <article class="card" data-os="mac">
@@ -296,7 +303,7 @@ footer { border-top: 1.5px solid var(--line); padding-top: 24px; display: flex; 
         <dt>Size</dt><dd>4.2 MB</dd>
         <dt>Needs</dt><dd>macOS 11 or later, Intel or Apple silicon, with Chrome, Edge or Brave</dd>
       </dl>
-      <p class="sha">SHA-256 3f930728d92b7e243f5a9c154819942ba80deb2f51ddfbbfd422a6099b137d3a</p>
+      <p class="sha">SHA-256 c5d14f8a96228ae479e0e52b4d41c3bd560dc5f8c22d3ef7701ae10faf23426f</p>
       <a class="btn primary" href="downloads/MouseKeyboardTest-macOS.zip" download>Download for macOS</a>
     </article>
     <article class="card" data-os="linux">
@@ -307,7 +314,7 @@ footer { border-top: 1.5px solid var(--line); padding-top: 24px; display: flex; 
         <dt>Size</dt><dd>2.1 MB</dd>
         <dt>Needs</dt><dd>64-bit Linux with Chrome, Chromium, Edge or Brave</dd>
       </dl>
-      <p class="sha">SHA-256 af5309c57aa1f6e95c14c6f07ffcf8ee39706dae148135f569f965313694bf4c</p>
+      <p class="sha">SHA-256 f56e851c03552d8b7672f2ff4f61bc64ef5a79515296b91e3183cd7b35cd9107</p>
       <a class="btn primary" href="downloads/MouseKeyboardTest-Linux.zip" download>Download for Linux</a>
     </article>
     <article class="card web">
@@ -336,6 +343,11 @@ footer { border-top: 1.5px solid var(--line); padding-top: 24px; display: flex; 
       <a id="mail" href="mailto:fsociety.shinjuu@gmail.com">fsociety.shinjuu@gmail.com</a>
       <button class="btn small" id="copy" type="button">Copy email</button>
     </div>
+    <ul class="links">
+      <li><span class="k">Facebook</span><a href="https://www.facebook.com/fsocietyshinjuu" target="_blank" rel="noopener noreferrer">facebook.com/fsocietyshinjuu</a></li>
+      <li><span class="k">Discord</span><span class="addr short">shinjuu0912</span><button class="btn small" type="button" data-copy="shinjuu0912" data-label="Copy username">Copy username</button></li>
+      <li><span class="k">Steam</span><a href="https://steamcommunity.com/id/shinjuu0912" target="_blank" rel="noopener noreferrer">steamcommunity.com/id/shinjuu0912</a></li>
+    </ul>
   </div>
   <div class="col">
     <h2 class="label">Credits</h2>
@@ -345,6 +357,20 @@ footer { border-top: 1.5px solid var(--line); padding-top: 24px; display: flex; 
       <li>Inspired by the mouse and keyboard tests at onlinemictest.com. This software is independent and has no affiliation with Online Mic Test, and it uses none of its code or artwork.</li>
       <li>The desktop apps open the test in your installed Edge, Chrome or other Chromium browser. The launcher is written in Go.</li>
     </ul>
+  </div>
+</section>
+
+<section class="cols" id="support" aria-label="Support the developer">
+  <div class="col">
+    <h2 class="label">Support the developer</h2>
+    <p>Mouse and Keyboard Test is free. If it helped you and you would like to say thanks, a donation helps pay for the time to keep improving it. It is entirely optional.</p>
+    <ul class="pay">
+      <li><span class="k">$WEMIX</span><code class="addr">0x096605352effe89ac90da09a735718096b86bf6c</code><button class="btn small" type="button" data-copy="0x096605352effe89ac90da09a735718096b86bf6c" data-label="Copy address">Copy address</button></li>
+      <li><span class="k">$BTC</span><code class="addr">bc1q0972yhewhpxrew3nvm307t328njmszupcdhxwl</code><button class="btn small" type="button" data-copy="bc1q0972yhewhpxrew3nvm307t328njmszupcdhxwl" data-label="Copy address">Copy address</button></li>
+      <li><span class="k">$USDT</span><code class="addr">0x0f8504fc596822af84b0e2176794a622d35af334</code><button class="btn small" type="button" data-copy="0x0f8504fc596822af84b0e2176794a622d35af334" data-label="Copy address">Copy address</button></li>
+    </ul>
+    <p>Prefer another donation platform? Contact the developer by email, Discord or Facebook.</p>
+    <p class="muted">Check the address carefully and confirm the network with the developer before you send, because a payment sent on the wrong network cannot be recovered. Donations are voluntary gifts. They do not buy support, features or any guarantee.</p>
   </div>
 </section>
 
@@ -368,7 +394,7 @@ footer { border-top: 1.5px solid var(--line); padding-top: 24px; display: flex; 
 
 <footer>
   <span>Copyright &copy; 2026 Shinjuu. All rights reserved.</span>
-  <span>Mouse and Keyboard Test 1.2.0</span>
+  <span>Mouse and Keyboard Test 1.2.1</span>
 </footer>
 
 </div>
@@ -394,6 +420,20 @@ footer { border-top: 1.5px solid var(--line); padding-top: 24px; display: flex; 
       btn.textContent = 'Press Ctrl+C';
     }
     try { navigator.clipboard.writeText(el.textContent).then(done, fallback); } catch (e) { fallback(); }
+  });
+
+  // Copy buttons for the donation addresses and the Discord username.
+  Array.prototype.forEach.call(document.querySelectorAll('[data-copy]'), function (b) {
+    b.addEventListener('click', function () {
+      var text = b.getAttribute('data-copy'), label = b.getAttribute('data-label') || 'Copy';
+      function done() { b.textContent = 'Copied'; setTimeout(function () { b.textContent = label; }, 1600); }
+      function fallback() {
+        var el = b.parentNode.querySelector('.addr');
+        if (el) { var r = document.createRange(); r.selectNodeContents(el); var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r); }
+        b.textContent = 'Press Ctrl+C';
+      }
+      try { navigator.clipboard.writeText(text).then(done, fallback); } catch (e) { fallback(); }
+    });
   });
 
   // Open the terms when the page is reached through the Terms link.

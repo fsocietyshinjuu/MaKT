@@ -166,6 +166,17 @@ svg { display: block; width: 100%; height: 100%; max-width: 100%; }
 .about .snd-level { margin: 0; font: 600 14px/1.4 ui-monospace, 'SF Mono', 'Cascadia Mono', Consolas, monospace; font-variant-numeric: tabular-nums; }
 @media (max-width: 520px) { .snd-big { font-size: 26px; } }
 @media (max-width: 380px) { .tabs button { padding: 8px 9px; } }
+.about .ab-links, .about .ab-pay { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+.ab-links li, .ab-pay li { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; }
+.ab-k { font-weight: 600; min-width: 5em; }
+.ab-links a { color: var(--lit); overflow-wrap: anywhere; }
+.ab-addr, .ab-mono {
+  font: 13px/1.4 ui-monospace, 'SF Mono', 'Cascadia Mono', Consolas, monospace;
+  overflow-wrap: anywhere; word-break: break-all; user-select: all; -webkit-user-select: all;
+  padding: 6px 10px; border: 1px solid var(--shell-edge); border-radius: 8px; background: var(--shell);
+}
+.ab-addr { flex: 1 1 280px; min-width: 0; }
+@media (max-width: 520px) { .ab-k { min-width: 100%; } }
 .ui { position: fixed; z-index: 5; font: 600 13px/1.35 system-ui, -apple-system, 'Segoe UI', sans-serif; color: var(--fg); }
 .actions {
   top: max(12px, env(safe-area-inset-top, 0px));
@@ -369,7 +380,7 @@ svg { display: block; width: 100%; height: 100%; max-width: 100%; }
 <header>
   <h1>Mouse and Keyboard Test</h1>
   <p class="ab-lead">A free tool that checks every mouse button, the scroll wheel and every key on your keyboard, on your own computer.</p>
-  <p class="ab-muted">Version 1.2.0 &middot; November 2026</p>
+  <p class="ab-muted">Version 1.2.1 &middot; November 2026</p>
 </header>
 
 <section>
@@ -385,7 +396,7 @@ svg { display: block; width: 100%; height: 100%; max-width: 100%; }
     <li><strong>Extras:</strong> a Reset button for each test and a light and dark mode.</li>
   </ul>
   <dl class="ab-specs">
-    <dt>Version</dt><dd>1.2.0</dd>
+    <dt>Version</dt><dd>1.2.1</dd>
     <dt>Released</dt><dd>November 2026</dd>
     <dt>Available for</dt><dd>Web browsers, Windows 10 and 11, macOS and Linux</dd>
     <dt>Works with</dt><dd>Any wired, wireless or Bluetooth mouse and keyboard that your system recognizes</dd>
@@ -402,8 +413,25 @@ svg { display: block; width: 100%; height: 100%; max-width: 100%; }
     <a id="dev-email" href="mailto:fsociety.shinjuu@gmail.com">fsociety.shinjuu@gmail.com</a>
     <button id="copy-email" class="toggle copy" type="button">Copy email</button>
   </div>
+  <ul class="ab-links">
+    <li><span class="ab-k">Facebook</span><a href="https://www.facebook.com/fsocietyshinjuu" target="_blank" rel="noopener noreferrer">facebook.com/fsocietyshinjuu</a></li>
+    <li><span class="ab-k">Discord</span><span class="ab-mono">shinjuu0912</span><button class="toggle copy" type="button" data-copy="shinjuu0912" data-label="Copy username">Copy username</button></li>
+    <li><span class="ab-k">Steam</span><a href="https://steamcommunity.com/id/shinjuu0912" target="_blank" rel="noopener noreferrer">steamcommunity.com/id/shinjuu0912</a></li>
+  </ul>
   <p>Questions, bug reports and ideas for new tests are welcome.</p>
   <p class="ab-muted">Copyright &copy; 2026 Shinjuu. All rights reserved.</p>
+</section>
+
+<section>
+  <h2>Support the developer</h2>
+  <p>Mouse and Keyboard Test is free. If it helped you and you would like to say thanks, a donation helps pay for the time to keep improving it. It is entirely optional.</p>
+  <ul class="ab-pay">
+    <li><span class="ab-k">$WEMIX</span><code class="ab-addr">0x096605352effe89ac90da09a735718096b86bf6c</code><button class="toggle copy" type="button" data-copy="0x096605352effe89ac90da09a735718096b86bf6c" data-label="Copy address">Copy address</button></li>
+    <li><span class="ab-k">$BTC</span><code class="ab-addr">bc1q0972yhewhpxrew3nvm307t328njmszupcdhxwl</code><button class="toggle copy" type="button" data-copy="bc1q0972yhewhpxrew3nvm307t328njmszupcdhxwl" data-label="Copy address">Copy address</button></li>
+    <li><span class="ab-k">$USDT</span><code class="ab-addr">0x0f8504fc596822af84b0e2176794a622d35af334</code><button class="toggle copy" type="button" data-copy="0x0f8504fc596822af84b0e2176794a622d35af334" data-label="Copy address">Copy address</button></li>
+  </ul>
+  <p>Prefer another donation platform? Contact the developer by email, Discord or Facebook.</p>
+  <p class="ab-muted">Check the address carefully and confirm the network with the developer before you send, because a payment sent on the wrong network cannot be recovered. Donations are voluntary gifts. They do not buy support, features or any guarantee.</p>
 </section>
 
 <section>
@@ -1155,6 +1183,19 @@ svg { display: block; width: 100%; height: 100%; max-width: 100%; }
       copyBtn.textContent = 'Press Ctrl+C';
     }
     try { navigator.clipboard.writeText(addr).then(done, fallback); } catch (err) { fallback(); }
+  });
+
+  Array.prototype.slice.call(document.querySelectorAll('[data-copy]')).forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var text = btn.getAttribute('data-copy'), label = btn.getAttribute('data-label') || 'Copy';
+      function done() { btn.textContent = 'Copied'; setTimeout(function () { btn.textContent = label; }, 1600); }
+      function fallback() {
+        var el = btn.parentNode.querySelector('.ab-addr, .ab-mono');
+        if (el) { var r = document.createRange(); r.selectNodeContents(el); var s = window.getSelection(); s.removeAllRanges(); s.addRange(r); }
+        btn.textContent = 'Press Ctrl+C';
+      }
+      try { navigator.clipboard.writeText(text).then(done, fallback); } catch (err) { fallback(); }
+    });
   });
 
   show(fromHash());
