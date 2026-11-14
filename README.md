@@ -7,13 +7,13 @@
 **Check every click, every key, your mouse DPI, your speakers and your microphone.**<br>
 Free, private and runs right in your browser. No account, nothing uploaded.
 
-![Version](https://img.shields.io/badge/version-1.2.1-1d6bff?style=flat-square)
+![Version](https://img.shields.io/badge/version-1.2.2-1d6bff?style=flat-square)
 ![Platforms](https://img.shields.io/badge/web%20%C2%B7%20Windows%20%C2%B7%20macOS%20%C2%B7%20Linux-14202e?style=flat-square)
 ![Dependencies](https://img.shields.io/badge/dependencies-none-2ea44f?style=flat-square)
 ![Data collected](https://img.shields.io/badge/data%20collected-none-2ea44f?style=flat-square)
 ![Price](https://img.shields.io/badge/price-free-1d6bff?style=flat-square)
 
-[**Open the web app**](https://fsocietyshinjuu.github.io/MaKT/app/) &nbsp;·&nbsp; [**Download for desktop**](#download) &nbsp;·&nbsp; [**Release notes**](#whats-new-in-121) &nbsp;·&nbsp; [**Support**](#support-the-developer)
+[**Open the web app**](app/) &nbsp;·&nbsp; [**Download for desktop**](#download) &nbsp;·&nbsp; [**Release notes**](#whats-new-in-122) &nbsp;·&nbsp; [**Support**](#support-the-developer)
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="assets/mouse-dark.jpg">
@@ -110,9 +110,9 @@ The desktop apps are in [`downloads/`](downloads/) and on the website. Each one 
 Compare the checksum of the file you downloaded with [`downloads/SHA256SUMS.txt`](downloads/SHA256SUMS.txt).
 
 ```text
-ca39ab8ac9bf93aaa219f615d55ad938e7ec03d46181e771e847b9e17ef817b7  MouseKeyboardTest-Windows.zip
-c5d14f8a96228ae479e0e52b4d41c3bd560dc5f8c22d3ef7701ae10faf23426f  MouseKeyboardTest-macOS.zip
-f56e851c03552d8b7672f2ff4f61bc64ef5a79515296b91e3183cd7b35cd9107  MouseKeyboardTest-Linux.zip
+29c517c225168b1ae66422497f4c2175e1c48357178278f137093f271f4a9f25  MouseKeyboardTest-Windows.zip
+56a718a12c2f01b7735571c8760422bb5c67bfe91ed3ca0e9ef26fae3b1525c0  MouseKeyboardTest-macOS.zip
+82113eadabc72e0a5b937d3b8671ac914d1d62e216c4d3727352af615e0629e4  MouseKeyboardTest-Linux.zip
 ```
 
 | System | Command |
@@ -188,12 +188,13 @@ Because the apps contain a copy of the web app, rebuild them whenever `app/index
    Keep the executable bit on the Linux and macOS files.
 4. Put the zips in `downloads/`, then update `SHA256SUMS.txt` and the sizes and checksums in the Downloads section of `index.html` and in this README.
 
-## What's new in 1.2.1
+## What's new in 1.2.2
 
-- **About tab and website:** a new *Support the developer* section with donation addresses and copy buttons, plus Facebook, Discord and Steam links.
-- Version 1.2.1 across the app, About page, website and macOS bundle.
+- **A new home for the donation info.** *Support the developer* is now a card at the bottom of the About tab and the website, with a copy button for each address.
+- **Developer links as buttons.** Facebook and Steam open in a new tab, and the Discord button copies the username.
+- **Cleaner text.** Paragraphs and headings now wrap evenly, with fewer lonely words on a line.
 
-**1.2.0** added the **Sound** tab: left, right and both speaker tests, output device and volume, and a microphone test with a live level meter, record and play back. **1.1.0** added the **DPI** tab. **1.0.0** was the first release.
+**1.2.1** added the donation addresses and the Facebook, Discord and Steam links. **1.2.0** added the **Sound** tab: left, right and both speaker tests, output device and volume, and a microphone test with a live level meter, record and play back. **1.1.0** added the **DPI** tab. **1.0.0** was the first release.
 
 ## Support the developer
 

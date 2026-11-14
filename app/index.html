@@ -166,17 +166,42 @@ svg { display: block; width: 100%; height: 100%; max-width: 100%; }
 .about .snd-level { margin: 0; font: 600 14px/1.4 ui-monospace, 'SF Mono', 'Cascadia Mono', Consolas, monospace; font-variant-numeric: tabular-nums; }
 @media (max-width: 520px) { .snd-big { font-size: 26px; } }
 @media (max-width: 380px) { .tabs button { padding: 8px 9px; } }
-.about .ab-links, .about .ab-pay { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
-.ab-links li, .ab-pay li { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; }
-.ab-k { font-weight: 600; min-width: 5em; }
-.ab-links a { color: var(--lit); overflow-wrap: anywhere; }
-.ab-addr, .ab-mono {
-  font: 13px/1.4 ui-monospace, 'SF Mono', 'Cascadia Mono', Consolas, monospace;
+.about p, .about li { text-wrap: pretty; }
+.about h1, .about h2, .about h3, .ab-lead { text-wrap: balance; }
+.ab-k { font-weight: 700; }
+.ab-addr {
+  font: 13px/1.45 ui-monospace, 'SF Mono', 'Cascadia Mono', Consolas, monospace;
   overflow-wrap: anywhere; word-break: break-all; user-select: all; -webkit-user-select: all;
-  padding: 6px 10px; border: 1px solid var(--shell-edge); border-radius: 8px; background: var(--shell);
 }
-.ab-addr { flex: 1 1 280px; min-width: 0; }
-@media (max-width: 520px) { .ab-k { min-width: 100%; } }
+.ab-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.ab-chip {
+  display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 999px; cursor: pointer;
+  border: 1.5px solid var(--shell-edge); background: var(--shell); color: var(--fg); text-decoration: none;
+  font: 600 13px/1 system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+.ab-chip:hover { border-color: var(--lit); color: var(--lit); }
+.ab-chip:focus-visible { outline: 2px solid var(--lit); outline-offset: 2px; }
+.ab-support {
+  display: flex; flex-direction: column; gap: 16px; margin-top: 8px; padding: 26px 24px; border: 1.5px solid transparent; border-radius: 22px;
+  background: linear-gradient(var(--shell), var(--shell)) padding-box, linear-gradient(135deg, var(--lit), #8b5cf6 55%, #ec4899) border-box;
+  box-shadow: 0 18px 40px -26px rgba(29, 107, 255, 0.55);
+}
+.ab-support-head { display: flex; align-items: center; gap: 14px; }
+.ab-heart {
+  flex: none; display: grid; place-items: center; width: 46px; height: 46px; border-radius: 14px; color: #fff;
+  background: linear-gradient(135deg, #ec4899, #8b5cf6);
+}
+.about .ab-kicker { margin: 0; font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.about .ab-support h2 { padding: 0; border: 0; margin: 2px 0 0; font-size: 21px; line-height: 1.25; letter-spacing: -0.01em; text-transform: none; color: var(--fg); }
+.about .ab-support-lead { color: var(--fg); text-wrap: balance; }
+.about .ab-support .ab-pay { list-style: none; padding: 0; margin: 0; max-width: none; gap: 10px; }
+.ab-coin { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 1.5px solid var(--shell-edge); border-radius: 14px; background: var(--wall); }
+.ab-dot { flex: none; width: 12px; height: 12px; border-radius: 50%; background: var(--c); box-shadow: 0 0 0 4px color-mix(in srgb, var(--c) 22%, transparent); }
+.ab-coin-body { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.ab-coin .ab-k { min-width: 0; }
+.ab-coin .ab-addr { flex: none; padding: 0; border: 0; background: none; font-size: 12.5px; }
+.ab-coin .toggle { flex: none; padding: 8px 14px; font-size: 13px; }
+@media (max-width: 520px) { .ab-support { padding: 20px 16px; } .ab-coin { flex-wrap: wrap; } .ab-coin .toggle { width: 100%; } }
 .ui { position: fixed; z-index: 5; font: 600 13px/1.35 system-ui, -apple-system, 'Segoe UI', sans-serif; color: var(--fg); }
 .actions {
   top: max(12px, env(safe-area-inset-top, 0px));
@@ -380,7 +405,7 @@ svg { display: block; width: 100%; height: 100%; max-width: 100%; }
 <header>
   <h1>Mouse and Keyboard Test</h1>
   <p class="ab-lead">A free tool that checks every mouse button, the scroll wheel and every key on your keyboard, on your own computer.</p>
-  <p class="ab-muted">Version 1.2.1 &middot; November 2026</p>
+  <p class="ab-muted">Version 1.2.2 &middot; November 2026</p>
 </header>
 
 <section>
@@ -396,7 +421,7 @@ svg { display: block; width: 100%; height: 100%; max-width: 100%; }
     <li><strong>Extras:</strong> a Reset button for each test and a light and dark mode.</li>
   </ul>
   <dl class="ab-specs">
-    <dt>Version</dt><dd>1.2.1</dd>
+    <dt>Version</dt><dd>1.2.2</dd>
     <dt>Released</dt><dd>November 2026</dd>
     <dt>Available for</dt><dd>Web browsers, Windows 10 and 11, macOS and Linux</dd>
     <dt>Works with</dt><dd>Any wired, wireless or Bluetooth mouse and keyboard that your system recognizes</dd>
@@ -413,25 +438,13 @@ svg { display: block; width: 100%; height: 100%; max-width: 100%; }
     <a id="dev-email" href="mailto:fsociety.shinjuu@gmail.com">fsociety.shinjuu@gmail.com</a>
     <button id="copy-email" class="toggle copy" type="button">Copy email</button>
   </div>
-  <ul class="ab-links">
-    <li><span class="ab-k">Facebook</span><a href="https://www.facebook.com/fsocietyshinjuu" target="_blank" rel="noopener noreferrer">facebook.com/fsocietyshinjuu</a></li>
-    <li><span class="ab-k">Discord</span><span class="ab-mono">shinjuu0912</span><button class="toggle copy" type="button" data-copy="shinjuu0912" data-label="Copy username">Copy username</button></li>
-    <li><span class="ab-k">Steam</span><a href="https://steamcommunity.com/id/shinjuu0912" target="_blank" rel="noopener noreferrer">steamcommunity.com/id/shinjuu0912</a></li>
-  </ul>
+  <div class="ab-chips">
+    <a class="ab-chip" href="https://www.facebook.com/fsocietyshinjuu" target="_blank" rel="noopener noreferrer">Facebook <span aria-hidden="true">&#8599;</span></a>
+    <a class="ab-chip" href="https://steamcommunity.com/id/shinjuu0912" target="_blank" rel="noopener noreferrer">Steam <span aria-hidden="true">&#8599;</span></a>
+    <button class="ab-chip" type="button" data-copy="shinjuu0912" data-label="Discord: shinjuu0912" title="Copy the Discord username">Discord: shinjuu0912</button>
+  </div>
   <p>Questions, bug reports and ideas for new tests are welcome.</p>
   <p class="ab-muted">Copyright &copy; 2026 Shinjuu. All rights reserved.</p>
-</section>
-
-<section>
-  <h2>Support the developer</h2>
-  <p>Mouse and Keyboard Test is free. If it helped you and you would like to say thanks, a donation helps pay for the time to keep improving it. It is entirely optional.</p>
-  <ul class="ab-pay">
-    <li><span class="ab-k">$WEMIX</span><code class="ab-addr">0x096605352effe89ac90da09a735718096b86bf6c</code><button class="toggle copy" type="button" data-copy="0x096605352effe89ac90da09a735718096b86bf6c" data-label="Copy address">Copy address</button></li>
-    <li><span class="ab-k">$BTC</span><code class="ab-addr">bc1q0972yhewhpxrew3nvm307t328njmszupcdhxwl</code><button class="toggle copy" type="button" data-copy="bc1q0972yhewhpxrew3nvm307t328njmszupcdhxwl" data-label="Copy address">Copy address</button></li>
-    <li><span class="ab-k">$USDT</span><code class="ab-addr">0x0f8504fc596822af84b0e2176794a622d35af334</code><button class="toggle copy" type="button" data-copy="0x0f8504fc596822af84b0e2176794a622d35af334" data-label="Copy address">Copy address</button></li>
-  </ul>
-  <p>Prefer another donation platform? Contact the developer by email, Discord or Facebook.</p>
-  <p class="ab-muted">Check the address carefully and confirm the network with the developer before you send, because a payment sent on the wrong network cannot be recovered. Donations are voluntary gifts. They do not buy support, features or any guarantee.</p>
 </section>
 
 <section>
@@ -459,6 +472,36 @@ svg { display: block; width: 100%; height: 100%; max-width: 100%; }
     <li><strong>Contact.</strong> For questions about these terms, write to fsociety.shinjuu@gmail.com.</li>
   </ol>
 </section>
+
+<footer class="ab-support" aria-labelledby="ab-support-h">
+  <div class="ab-support-head">
+    <span class="ab-heart" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></span>
+    <div>
+      <p class="ab-kicker">Support the developer</p>
+      <h2 id="ab-support-h">Enjoying Mouse and Keyboard Test?</h2>
+    </div>
+  </div>
+  <p class="ab-support-lead">It is free to use. If it helped you, a donation helps pay for the time to keep improving it. It is entirely optional, and a kind word is just as welcome.</p>
+  <ul class="ab-pay">
+    <li class="ab-coin">
+      <span class="ab-dot" style="--c:#7c3aed" aria-hidden="true"></span>
+      <div class="ab-coin-body"><span class="ab-k">$WEMIX</span><code class="ab-addr">0x096605352effe89ac90da09a735718096b86bf6c</code></div>
+      <button class="toggle copy" type="button" data-copy="0x096605352effe89ac90da09a735718096b86bf6c" data-label="Copy address">Copy address</button>
+    </li>
+    <li class="ab-coin">
+      <span class="ab-dot" style="--c:#f7931a" aria-hidden="true"></span>
+      <div class="ab-coin-body"><span class="ab-k">$BTC</span><code class="ab-addr">bc1q0972yhewhpxrew3nvm307t328njmszupcdhxwl</code></div>
+      <button class="toggle copy" type="button" data-copy="bc1q0972yhewhpxrew3nvm307t328njmszupcdhxwl" data-label="Copy address">Copy address</button>
+    </li>
+    <li class="ab-coin">
+      <span class="ab-dot" style="--c:#26a17b" aria-hidden="true"></span>
+      <div class="ab-coin-body"><span class="ab-k">$USDT</span><code class="ab-addr">0x0f8504fc596822af84b0e2176794a622d35af334</code></div>
+      <button class="toggle copy" type="button" data-copy="0x0f8504fc596822af84b0e2176794a622d35af334" data-label="Copy address">Copy address</button>
+    </li>
+  </ul>
+  <p>Prefer another donation platform? Contact the developer by email, Discord or Facebook.</p>
+  <p class="ab-muted">Check the address carefully and confirm the network with the developer before you send, because a payment sent on the wrong network cannot be recovered. Donations are voluntary gifts. They do not buy support, features or any guarantee.</p>
+</footer>
 
 </div>
 </div>
@@ -1190,7 +1233,7 @@ svg { display: block; width: 100%; height: 100%; max-width: 100%; }
       var text = btn.getAttribute('data-copy'), label = btn.getAttribute('data-label') || 'Copy';
       function done() { btn.textContent = 'Copied'; setTimeout(function () { btn.textContent = label; }, 1600); }
       function fallback() {
-        var el = btn.parentNode.querySelector('.ab-addr, .ab-mono');
+        var el = btn.parentNode.querySelector('.ab-addr');
         if (el) { var r = document.createRange(); r.selectNodeContents(el); var s = window.getSelection(); s.removeAllRanges(); s.addRange(r); }
         btn.textContent = 'Press Ctrl+C';
       }
